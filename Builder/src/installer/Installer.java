@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import muifile.ReaderWriterMUI;
 
@@ -39,13 +41,14 @@ import org.apache.commons.io.IOUtils;
 import resources.MemoryFile;
 import resources.ParserVersion;
 import resources.ResUtils;
+import win7.Utils;
 
 /**
  * Ствараем файл усталёўкі для NSIS.
  */
 public class Installer {
-    static File SOURCE_DIR = new File("mui-bin/");
-    static File FILES_DIR = new File("out/");
+    static File SOURCE_DIR = new File("../Files/");
+    static File OUT_DIR = new File("../out/");
 
     /** Трэба падаваць свае назвы, бо у JDK 1.6 назвы месяцаў няправільныя. */
     protected static final String[] MONTHS = new String[] { "студзеня", "лютага", "сакавіка", "красавіка",
@@ -67,16 +70,16 @@ public class Installer {
         SYSDIR64.put("Windows", "$WINDIR");
 
         Process p32 = new Process(SYSDIR32);
-        p32.listFiles("x32sprtm/", false);
-        p32.listFiles("x32sp0/", false);
-        p32.listFiles("x32sp1/", false);
-        p32.listFiles("ie8x32sp0/", true);
-        p32.listFiles("ie9x32sp0/", true);
+        p32.listFiles("x32sprtm", false);
+        p32.listFiles("x32sp0", false);
+        p32.listFiles("x32sp1", false);
+        p32.listFiles("ie8x32sp0", true);
+        p32.listFiles("ie9x32sp0", true);
         Process p64 = new Process(SYSDIR64);
-        p64.listFiles("x64sp0/", false);
-        p64.listFiles("x64sp1/", false);
-        p64.listFiles("ie8x64sp0/", true);
-        p64.listFiles("ie9x64sp0/", true);
+        p64.listFiles("x64sp0", false);
+        p64.listFiles("x64sp1", false);
+        p64.listFiles("ie8x64sp0", true);
+        p64.listFiles("ie9x64sp0", true);
 
         Calendar c = Calendar.getInstance();
         String dateText = c.get(Calendar.DAY_OF_MONTH) + " " + MONTHS[c.get(Calendar.MONTH)] + " "
@@ -104,7 +107,7 @@ public class Installer {
         patchFile("Belarusian.nlf", templateVars);
         patchFile("Belarusian.nsh", templateVars);
         copy("win7i18n.ico");
-        FileUtils.writeStringToFile(new File("out/i18n-bel-win7.version.txt"), dateTextMark);
+        FileUtils.writeStringToFile(new File(OUT_DIR, "i18n-bel-win7.version.txt"), dateTextMark);
     }
 
     protected static void patchFile(String fn, Map<String, String> templateVars) throws Exception {
@@ -115,11 +118,11 @@ public class Installer {
             out = out.replace(e.getKey(), e.getValue());
         }
 
-        FileUtils.writeStringToFile(new File("out/" + fn), out, "Cp1251");
+        FileUtils.writeStringToFile(new File(OUT_DIR, fn), out, "Cp1251");
     }
 
-    protected static String getVersion(String fn) throws Exception {
-        ReaderWriterMUI mui = new ReaderWriterMUI(FileUtils.readFileToByteArray(new File(SOURCE_DIR, fn)));
+    protected static String getVersion(byte[] file) throws Exception {
+        ReaderWriterMUI mui = new ReaderWriterMUI(file);
         byte[] ver = mui.getCompiledResources().get(ResUtils.TYPE_VERSION).get(1);
         ParserVersion pv = new ParserVersion();
         pv.parse(1, new MemoryFile(ver), new PrintWriter(new StringWriter()));
@@ -151,7 +154,7 @@ public class Installer {
 
     protected static void copy(String file) throws Exception {
         byte[] data = IOUtils.toByteArray(Installer.class.getResourceAsStream("/installer/" + file));
-        FileUtils.writeByteArrayToFile(new File("out/" + file), data);
+        FileUtils.writeByteArrayToFile(new File(OUT_DIR, file), data);
     }
 
     protected static class Process {
@@ -169,14 +172,20 @@ public class Installer {
         }
 
         public void listFiles(String dirSrc, boolean optional) throws Exception {
-            Map<String, File> files = ResUtils.listFiles(new File(FILES_DIR, dirSrc), null);
+            Map<String, File> files = ResUtils.listFiles(new File(OUT_DIR, dirSrc), null);
             for (Map.Entry<String, File> f : files.entrySet()) {
                 try {
                     String winFile = getSysDirFile(f.getKey());
-                    String diskFile = dirSrc + f.getKey();
+                    String diskFile = dirSrc + '/' + f.getKey();
                     String version;
+
+                    ZipFile zip = new ZipFile(new File(SOURCE_DIR, dirSrc+".zip"));
+                    byte[] originalFile = Utils.readZip(zip,
+                            new ZipEntry(f.getKey().replace("/be-BY/", "/en-US/")));
+                    zip.close();
+
                     if (winFile.endsWith(".mui")) {
-                        version = getVersion(dirSrc + f.getKey().replace("/be-BY/", "/en-US/"));
+                        version = getVersion(originalFile);
                     } else {
                         version = "z";// getSha1(dirSrc + f.getKey().replace("/be-BY/", "/en-US/"));
                     }
@@ -241,7 +250,7 @@ public class Installer {
 
             return o.toString();
         }
-        
+
         int filesCount() {
             return versions.size();
         }

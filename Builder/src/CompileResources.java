@@ -24,18 +24,23 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import muifile.ReaderWriterMUI;
 
@@ -45,8 +50,6 @@ import org.omegat.core.Core;
 import org.omegat.core.data.ProjectProperties;
 import org.omegat.core.data.RealProject;
 import org.omegat.filters2.master.PluginUtils;
-import org.omegat.util.Log;
-import org.omegat.util.OStrings;
 import org.omegat.util.ProjectFileStorage;
 import org.omegat.util.RuntimePreferences;
 
@@ -59,20 +62,21 @@ import resources.io.WriterRC;
 import resources.res.RESFile;
 import win7.DialogSizes;
 import win7.SkipResources;
+import win7.Utils;
 
 /**
  * Гэты клясс абыходзіць .mui файлы ў каталёзе mui-bin/ і накладае на іх новыя перакладзеныя рэсурсы.
  */
 public class CompileResources {
 
-    static String projectPath = "e:/sf.net/i18n-bel/Windows7/";
-    static String configPath = "e:/sf.net/i18n-bel/Windows7.settings/";
+    static String sPath = "../Files/";
+    static String projectPath = "../../Windows.OmegaT/Windows7/";
+    static String configPath = "../../Windows.OmegaT/Windows7.settings/";
+    static String outPath = "../out/";
 
     static Map<String, List<JSENtry>> JS_TRANS = new TreeMap<String, List<JSENtry>>();
 
     static DialogSizes places;
-
-    static String sPath = "mui-bin/";
 
     static Map<String, String> list = new HashMap<String, String>();
 
@@ -94,7 +98,7 @@ public class CompileResources {
         translate();
 
         // remote output dir
-        FileUtils.deleteDirectory(new File("out"));
+        FileUtils.deleteDirectory(new File(outPath));
 
         readList();
 
@@ -103,28 +107,42 @@ public class CompileResources {
         readJStrans(new File(projectPath + "/js-trans.txt"));
         places = new DialogSizes(new File(projectPath + "/dialog-sizes.txt"));
 
-        Map<String, File> files = ResUtils.listFiles(new File(sPath), null);
-        files.remove("list.txt");
+        File[] zips = new File(sPath).listFiles(new FileFilter() {
+            public boolean accept(File pathname) {
+                return pathname.isFile() && pathname.getName().endsWith(".zip");
+            }
+        });
 
         int errors = 0;
 
-        for (Map.Entry<String, File> f : files.entrySet()) {
-            System.err.println(f.getKey());
-            try {
-                String trFile = list.get(f.getKey());
-
-                File out = new File("out/" + f.getKey().replace("/en-US/", "/be-BY/"));
-                out.getParentFile().mkdirs();
-                if (f.getKey().toLowerCase().endsWith(".mui")) {
-                    goMUI(f.getValue(), out, new File(rcPath + trFile), f.getKey(), trFile);
-                } else if (f.getKey().toLowerCase().endsWith(".js")) {
-                    goJS(trFile, f.getValue(), out);
-                } else {
-                    FileUtils.copyFile(new File(rcPath, trFile), out);
+        for (File z : zips) {
+            ZipFile zip = new ZipFile(z);
+            for (Enumeration<? extends ZipEntry> zit = zip.entries(); zit.hasMoreElements();) {
+                ZipEntry ze = zit.nextElement();
+                if (ze.isDirectory()) {
+                    continue;
                 }
-            } catch (Exception ex) {
-                errors++;
-                ex.printStackTrace();
+
+                String fspath = z.getName().replace(".zip", "") + "/" + ze.getName();
+                byte[] data = Utils.readZip(zip, ze);
+
+                System.err.println(fspath);
+                try {
+                    String trFile = list.get(fspath);
+
+                    File out = new File(outPath + fspath.replace("/en-US/", "/be-BY/"));
+                    out.getParentFile().mkdirs();
+                    if (fspath.toLowerCase().endsWith(".mui")) {
+                        goMUI(data, out, new File(rcPath + trFile), fspath, trFile);
+                    } else if (fspath.toLowerCase().endsWith(".js")) {
+                        goJS(trFile, data, out);
+                    } else {
+                        FileUtils.copyFile(new File(rcPath, trFile), out);
+                    }
+                } catch (Exception ex) {
+                    errors++;
+                    ex.printStackTrace();
+                }
             }
         }
         System.err.println("-------------------------------------------------------------------------");
@@ -207,26 +225,25 @@ public class CompileResources {
         }
     }
 
-    protected static void goJS(String file, File inFile, File outFile) throws Exception {
+    protected static void goJS(String file, byte[] data, File outFile) throws Exception {
         List<JSENtry> trans = JS_TRANS.get(file);
-        List<String> lines = FileUtils.readLines(inFile, "UTF-16LE");
-        if (trans != null) {
-            for (int i = 0; i < lines.size(); i++) {
-                String s = lines.get(i);
-                String t = null;
+        BufferedReader rd = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data),
+                "UTF-16LE"));
+        Writer wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "UTF-16LE"));
+        String s;
+        while ((s = rd.readLine()) != null) {
+            if (trans != null) {
                 for (JSENtry e : trans) {
                     if (s.equals(e.source)) {
-                        t = e.target;
+                        s = e.target;
                         e.processed = true;
                         break;
                     }
                 }
-                if (t != null) {
-                    lines.set(i, t);
-                }
             }
+            wr.write(s + "\r\n");
         }
-        FileUtils.writeLines(outFile, "UTF-16LE", lines, "\r\n");
+        wr.close();
     }
 
     protected static void reportJS() {
@@ -252,11 +269,11 @@ public class CompileResources {
     static File tempRcFile = new File("temp.rc");
     static String tempMtPrefix = "tempmt";
 
-    protected static void goMUI(File inFile, File outFile, File rcFile, String inFileName, String trFileName)
+    protected static void goMUI(byte[] data, File outFile, File rcFile, String inFileName, String trFileName)
             throws Exception {
-        tryRecreate(inFile, inFileName, trFileName);
+        tryRecreate(data, inFileName, trFileName);
 
-        ReaderWriterMUI mui = new ReaderWriterMUI(FileUtils.readFileToByteArray(inFile));
+        ReaderWriterMUI mui = new ReaderWriterMUI(data);
         ResUtils.removeEmptyStrings(mui.getCompiledResources());
 
         // compile localized resources
@@ -301,9 +318,7 @@ public class CompileResources {
      * If original and created files are equals, we able to recreate file without errors, so, we can create
      * translated MUI.
      */
-    protected static void tryRecreate(File origin, String fn, String trFileName) throws Exception {
-        // read ofiginal MUI file
-        byte[] originData = FileUtils.readFileToByteArray(origin);
+    protected static void tryRecreate(byte[] originData, String fn, String trFileName) throws Exception {
         // parse binary DLL to separate binary resources
         ReaderWriterMUI mui = new ReaderWriterMUI(originData);
 

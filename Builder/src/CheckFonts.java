@@ -40,9 +40,10 @@ import win7.SkipResources;
  * ангельскі.
  */
 public class CheckFonts {
+    static File OUT_DIR = new File("../out/");
 
     public static void main(String[] a) throws Exception {
-        Map<String, File> filesMUI = ResUtils.listFiles(new File("out/"), "mui");
+        Map<String, File> filesMUI = ResUtils.listFiles(OUT_DIR, "mui");
 
         for (Map.Entry<String, File> e : filesMUI.entrySet()) {
             System.out.println(e.getKey());
@@ -62,21 +63,21 @@ public class CheckFonts {
                     if (!(it.title instanceof String)) {
                         continue;
                     }
-//                    int linesCount = 1;
-//                    try {
-//                        int h = it.cy;
-//                        if (h == dialog.pointsize - 1) {
-//                            h++;
-//                        }
-//                        linesCount = h / dialog.pointsize;
-//                    } catch (ArithmeticException ex) {
-//                        ex.printStackTrace();
-//                        System.out.println(en.getKey() + "/" + it.id + " - zero height");
-//                    }
-//                    if (linesCount == 0) {
-//                        System.out.println(en.getKey() + "/" + it.id + " - zero height");
-//                        continue;
-//                    }
+                    // int linesCount = 1;
+                    // try {
+                    // int h = it.cy;
+                    // if (h == dialog.pointsize - 1) {
+                    // h++;
+                    // }
+                    // linesCount = h / dialog.pointsize;
+                    // } catch (ArithmeticException ex) {
+                    // ex.printStackTrace();
+                    // System.out.println(en.getKey() + "/" + it.id + " - zero height");
+                    // }
+                    // if (linesCount == 0) {
+                    // System.out.println(en.getKey() + "/" + it.id + " - zero height");
+                    // continue;
+                    // }
                     int w = getDimension(dialog, (String) it.title).width;
                     if (w > it.cx) {
                         System.out.println(en.getKey() + "/" + it.id + " - \"" + it.title + "\" need width: "
