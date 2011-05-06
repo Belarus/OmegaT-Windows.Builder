@@ -168,7 +168,7 @@ Section
     
     CreateDirectory  '$INSTDIR'
     
-    File "/oname=$TEMP\win7bel-chown.exe" "..\updater\chown.exe"
+    File "/oname=$TEMP\win7bel-chown.exe" "..\Builder\updater\chown.exe"
     ExecWait '$TEMP\win7bel-chown.exe $WINDIR\servicing $WINDIR\diagnostics\system\DeviceCenter' $0
     IntCmp $0 0 +2
         Abort
@@ -198,13 +198,13 @@ Section
     ${EndIf}
 
 ; write updater
-    File "/oname=$INSTDIR\win7bel-updater.exe" "..\updater\win7bel-updater.exe"
+    File "/oname=$INSTDIR\win7bel-updater.exe" "..\Builder\updater\win7bel-updater.exe"
     FileOpen $0 "$INSTDIR\version.txt" w
     FileWrite $0 "##DATEMARK##"
     FileClose $0
 ; write scheduler for updater
-    File "/oname=$TEMP\win7bel-scheduler.exe" "..\updater\win7bel-scheduler.exe"
-    File "/oname=$TEMP\Interop.TaskScheduler.dll" "..\updater\Interop.TaskScheduler.dll"
+    File "/oname=$TEMP\win7bel-scheduler.exe" "..\Builder\updater\win7bel-scheduler.exe"
+    File "/oname=$TEMP\Interop.TaskScheduler.dll" "..\Builder\updater\Interop.TaskScheduler.dll"
     ExecWait '$TEMP\win7bel-scheduler.exe' $0    
 
     WriteRegDWORD       HKLM "SYSTEM\CurrentControlSet\Control\MUI\UILanguages\be-BY" "LCID" 0x00000423
