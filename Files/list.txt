@@ -882,6 +882,22 @@ Windows/System32/en-US/fdprint.dll_x32sp0.mui.rc
 +x64sp0/Windows/System32/en-US/fdprint.dll.mui
 +x64sp1/Windows/System32/en-US/fdprint.dll.mui
 
+Windows/System32/en-US/fontext.dll_x32sp0.mui.rc
++x32sp0/Windows/System32/en-US/fontext.dll.mui
++x32sp1/Windows/System32/en-US/fontext.dll.mui
++x64sp0/Windows/SysWOW64/en-US/fontext.dll.mui
++x64sp0/Windows/System32/en-US/fontext.dll.mui
++x64sp1/Windows/SysWOW64/en-US/fontext.dll.mui
++x64sp1/Windows/System32/en-US/fontext.dll.mui
+
+Windows/System32/en-US/fontview.exe_x32sp0.mui.rc
++x32sp0/Windows/System32/en-US/fontview.exe.mui
++x32sp1/Windows/System32/en-US/fontview.exe.mui
++x64sp0/Windows/SysWOW64/en-US/fontview.exe.mui
++x64sp0/Windows/System32/en-US/fontview.exe.mui
++x64sp1/Windows/SysWOW64/en-US/fontview.exe.mui
++x64sp1/Windows/System32/en-US/fontview.exe.mui
+
 Windows/System32/en-US/fsquirt.exe_x32sp0.mui.rc
 +x32sp0/Windows/System32/en-US/fsquirt.exe.mui
 +x32sp1/Windows/System32/en-US/fsquirt.exe.mui
@@ -1319,6 +1335,10 @@ Windows/System32/en-US/wmploc.DLL_x32sp0.mui.rc
 +x64sp0/Windows/System32/en-US/wmploc.DLL.mui
 +x64sp1/Windows/SysWOW64/en-US/wmploc.DLL.mui
 +x64sp1/Windows/System32/en-US/wmploc.DLL.mui
+
+Windows/System32/en-US/wuaueng.dll_x32sp1.mui.rc
++x32sp1/Windows/System32/en-US/wuaueng.dll.mui
++x64sp1/Windows/System32/en-US/wuaueng.dll.mui
 
 Windows/System32/en-US/wucltux.dll_x32sp0.mui.rc
 +x32sp0/Windows/System32/en-US/wucltux.dll.mui
