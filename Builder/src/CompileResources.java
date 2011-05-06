@@ -100,12 +100,13 @@ public class CompileResources {
         // remote output dir
         FileUtils.deleteDirectory(new File(outPath));
 
+        places = new DialogSizes(new File(projectPath + "/dialog-sizes.txt"));
+
         readList();
 
         String rcPath = projectPath + "/target/";
 
         readJStrans(new File(projectPath + "/js-trans.txt"));
-        places = new DialogSizes(new File(projectPath + "/dialog-sizes.txt"));
 
         File[] zips = new File(sPath).listFiles(new FileFilter() {
             public boolean accept(File pathname) {
@@ -146,7 +147,7 @@ public class CompileResources {
             }
         }
         System.err.println("-------------------------------------------------------------------------");
-        System.err.println("Errors: " + errors);
+        System.err.println("Errors: " + (errors + places.errors));
         reportJS();
 
         places.report();
@@ -195,6 +196,7 @@ public class CompileResources {
             }
             if (s.startsWith("+")) {
                 list.put(s.substring(1), rcFileName);
+                places.incCounts(rcFileName);
             } else {
                 rcFileName = s;
             }

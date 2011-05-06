@@ -25,10 +25,12 @@ public class DialogSizes {
     static Pattern RE_DIALOG = Pattern.compile("DIALOG/(.+)");
     static Pattern RE_CONTROL = Pattern.compile("\"(.*)\"\\s*,\\s+(\\-?[0-9]+)");
     static Pattern RE_PLACE = Pattern
-            .compile("([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*\\-\\>\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)");
+            .compile("([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*\\-\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)");
 
     // Map<file,Map<dialogID,List>>
     final Map<String, Map<Object, List<SizeChange>>> changes = new TreeMap<String, Map<Object, List<SizeChange>>>();
+
+    public int errors;
 
     public DialogSizes(File szFile) throws Exception {
         BufferedReader rd = new BOMBufferedReader(new InputStreamReader(new FileInputStream(szFile), "UTF-8"));
@@ -66,11 +68,30 @@ public class DialogSizes {
                 ch = new SizeChange();
                 ch.controlTitle = m.group(1);
                 ch.controlID = Long.parseLong(m.group(2));
+            } else if ("<DIALOG>".equals(s)) {
+                // dialog box
+                ch = new SizeChange();
+                ch.controlTitle = null;
+                ch.controlID = 0;
             } else if ((m = RE_PLACE.matcher(s)).matches()) {
                 ch.oldPlace = getRect(m, 1);
                 ch.newPlace = getRect(m, 5);
                 changes.get(file).get(dialogID).add(ch);
                 ch = null;
+            } else {
+                throw new Exception("Unknown line in DialogSizes: " + s);
+            }
+        }
+    }
+
+    public void incCounts(String filename) {
+        Map<Object, List<SizeChange>> changesForFile = changes.get(filename);
+        if (changesForFile == null) {
+            return;
+        }
+        for (Map.Entry<Object, List<SizeChange>> d : changesForFile.entrySet()) {
+            for (SizeChange sc : d.getValue()) {
+                sc.appliedLeaved++;
             }
         }
     }
@@ -93,9 +114,10 @@ public class DialogSizes {
                 byte[] dialogResource = dialogs.get(k);
                 // now - dialogChanges vs dialogResource
                 ResourceDialog dlg = new ParserDialog(new MemoryFile(dialogResource)).parse();
+                applyChanges(dlg, dialogChanges, dryRun);
 
                 for (ResourceDialog.DlgItemTemplateEx dlgItem : dlg.items) {
-                    applyChanges(dlgItem, dialogChanges, dryRun);
+                    applyChanges(k, dlgItem, dialogChanges, dryRun);
                 }
 
                 MemoryFile outDialog = new MemoryFile();
@@ -115,7 +137,7 @@ public class DialogSizes {
         for (Map.Entry<String, Map<Object, List<SizeChange>>> f : changes.entrySet()) {
             for (Map.Entry<Object, List<SizeChange>> d : f.getValue().entrySet()) {
                 for (SizeChange sc : d.getValue()) {
-                    if (!sc.applied) {
+                    if (sc.appliedLeaved > 0) {
                         System.err.println("Not fixed size for DIALOG #" + d.getKey() + " control#"
                                 + sc.controlID + " in file " + f.getKey());
                     }
@@ -124,22 +146,48 @@ public class DialogSizes {
         }
     }
 
-    private void applyChanges(ResourceDialog.DlgItemTemplateEx dialogItem, List<SizeChange> dialogChanges,
-            boolean dryRun) throws Exception {
+    /**
+     * Change pos for dialog.
+     */
+    private void applyChanges(ResourceDialog dialog, List<SizeChange> dialogChanges, boolean dryRun)
+            throws Exception {
+        for (SizeChange ch : dialogChanges) {
+            if (ch.controlID == 0 && ch.controlTitle == null && ch.oldPlace.x == dialog.x
+                    && ch.oldPlace.y == dialog.y && ch.oldPlace.width == dialog.cx
+                    && ch.oldPlace.height == dialog.cy) {
+                if (!dryRun) {
+                    dialog.x = (short) ch.newPlace.x;
+                    dialog.y = (short) ch.newPlace.y;
+                    dialog.cx = (short) ch.newPlace.width;
+                    dialog.cy = (short) ch.newPlace.height;
+                    ch.appliedLeaved--;
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * Change pos for dialog's control.
+     */
+    private void applyChanges(Object dialogID, ResourceDialog.DlgItemTemplateEx dialogItem,
+            List<SizeChange> dialogChanges, boolean dryRun) throws Exception {
         for (SizeChange ch : dialogChanges) {
             if (ch.controlID == dialogItem.id && ch.oldPlace.x == dialogItem.x
                     && ch.oldPlace.y == dialogItem.y && ch.oldPlace.width == dialogItem.cx
                     && ch.oldPlace.height == dialogItem.cy) {
                 if (!dryRun) {
                     if (!eqEmpty(ch.controlTitle, (String) dialogItem.title)) {
-                        throw new Exception("Wrong text in control: compiled: [" + dialogItem.title
-                                + "] in changes: [" + ch.controlTitle + "]");
+                        errors++;
+                        System.err.println("Wrong text in control #" + dialogID + "/" + dialogItem.id
+                                + ": compiled: [" + dialogItem.title + "] in changes: [" + ch.controlTitle
+                                + "]");
                     }
                     dialogItem.x = (short) ch.newPlace.x;
                     dialogItem.y = (short) ch.newPlace.y;
                     dialogItem.cx = (short) ch.newPlace.width;
                     dialogItem.cy = (short) ch.newPlace.height;
-                    ch.applied = true;
+                    ch.appliedLeaved--;
                 }
                 break;
             }
@@ -167,7 +215,7 @@ public class DialogSizes {
         long controlID;
         String controlTitle;
         Rectangle oldPlace, newPlace;
-        boolean applied;
+        int appliedLeaved; // колькі разоў трэба аплаіць
     }
 
     public class BOMBufferedReader extends BufferedReader {
