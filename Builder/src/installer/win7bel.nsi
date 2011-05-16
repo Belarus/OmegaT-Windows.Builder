@@ -134,11 +134,11 @@ Function wrongVersionsCheck
     ${If} ${RunningX64}
         ${DisableX64FSRedirection}
 
-        nxs::Show /NOUNLOAD "Спраўджваем усталяваныя версіі..." /top "" /sub "" /max ##FILESCOUNT64##
+        nxs::Show /NOUNLOAD "Спраўджваем усталяваныя версіі..." /top "" /sub "" /max /end ##FILESCOUNT64##
         ##FILEVERSIONS64##
         ${EnableX64FSRedirection}
     ${Else}
-        nxs::Show /NOUNLOAD "Спраўджваем усталяваныя версіі..." /top "" /sub "" /max ##FILESCOUNT32##
+        nxs::Show /NOUNLOAD "Спраўджваем усталяваныя версіі..." /top "" /sub "" /max /end ##FILESCOUNT32##
         ##FILEVERSIONS32##
     ${EndIf}
     

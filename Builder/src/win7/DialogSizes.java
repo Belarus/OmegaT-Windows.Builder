@@ -66,7 +66,7 @@ public class DialogSizes {
                 }
             } else if ((m = RE_CONTROL.matcher(s)).matches()) {
                 ch = new SizeChange();
-                ch.controlTitle = m.group(1);
+                ch.controlTitle = removeSlashes(m.group(1));
                 ch.controlID = Long.parseLong(m.group(2));
             } else if ("<DIALOG>".equals(s)) {
                 // dialog box
@@ -82,6 +82,32 @@ public class DialogSizes {
                 throw new Exception("Unknown line in DialogSizes: " + s);
             }
         }
+    }
+
+    public String removeSlashes(String s) {
+        StringBuilder out = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+            case '\\':
+                i++;
+                c = s.charAt(i);
+                switch (c) {
+                case 'n':
+                    c = '\n';
+                    break;
+                case 'r':
+                    c = '\r';
+                    break;
+                case 't':
+                    c = '\t';
+                    break;
+                }
+                break;
+            }
+            out.append(c);
+        }
+        return out.toString();
     }
 
     public void incCounts(String filename) {

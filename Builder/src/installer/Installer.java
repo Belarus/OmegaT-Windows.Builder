@@ -242,7 +242,7 @@ public class Installer {
                         o.append("\tPush \"" + v + "\"\n");
                     }
                     o.append("\tCall VersionsCheckFunc\n");
-                    o.append("\tnxs::Update /NOUNLOAD /pos $9\n");
+                    o.append("\tnxs::Update /NOUNLOAD \"Спраўджваем усталяваныя версіі...\" /pos $9 /end\n");
                     o.append("\tIntOp $9 $9 + 1\n");
                     o.append("\n");
                 }
