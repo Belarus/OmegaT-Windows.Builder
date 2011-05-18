@@ -74,11 +74,13 @@ public class Installer {
         p32.listFiles("x32sp0", false);
         p32.listFiles("x32sp1", false);
         p32.listFiles("ie8x32sp0", true);
+        p32.listFiles("ie8x32sp1", true);
         p32.listFiles("ie9x32sp0", true);
         Process p64 = new Process(SYSDIR64);
         p64.listFiles("x64sp0", false);
         p64.listFiles("x64sp1", false);
         p64.listFiles("ie8x64sp0", true);
+        p64.listFiles("ie8x64sp1", true);
         p64.listFiles("ie9x64sp0", true);
 
         Calendar c = Calendar.getInstance();
