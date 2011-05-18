@@ -45,6 +45,7 @@ LoadLanguageFile "Belarusian.nlf"
 Var /GLOBAL DIR
 Var /GLOBAL outFile
 Var /GLOBAL wrongVersionsText
+Var /GLOBAL FirstInstall ; Усталёўваем першы раз - прапанаваць reboot
 
 
 Function FindMuiFile
@@ -207,6 +208,11 @@ Section
     File "/oname=$TEMP\Interop.TaskScheduler.dll" "..\Builder\updater\Interop.TaskScheduler.dll"
     ExecWait '$TEMP\win7bel-scheduler.exe' $0    
 
+; first install ?
+    ${registry::KeyExists} "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\MUI\UILanguages\be-BY" $FirstInstall
+; remove mui cache
+    DeleteRegKey        HKCR "Local Settings\MuiCache"
+; write language to regitry
     WriteRegDWORD       HKLM "SYSTEM\CurrentControlSet\Control\MUI\UILanguages\be-BY" "LCID" 0x00000423
     WriteRegStr         HKLM "SYSTEM\CurrentControlSet\Control\MUI\UILanguages\be-BY" "DefaultFallback" "en-US"
     WriteRegDWORD       HKLM "SYSTEM\CurrentControlSet\Control\MUI\UILanguages\be-BY" "Type" 0x00000094
@@ -243,4 +249,10 @@ IfRebootFlag 0 NoReboot
   MessageBox MB_YESNO|MB_ICONQUESTION "Каб выдаліць некаторыя файлы трэба перазапусціць камп'ютар. Зрабіць гэта зараз ?" IDNO NoReboot
     Reboot
 NoReboot:
+
+  IntCmp $FirstInstall 0 NoRebootFirst
+    MessageBox MB_YESNO|MB_ICONQUESTION "Каб мець магчымасьць абраць беларускую мову ў панэлі кіраваньня трэба перазапусціць камп'ютар. Зрабіць гэта зараз ?" IDNO NoRebootFirst
+      Reboot
+NoRebootFirst:
+
 SectionEnd
