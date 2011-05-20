@@ -104,7 +104,7 @@ again:
     StrCmp $1 $0 done 0
     Goto again
 wrong:
-;        MessageBox MB_OK "Немагчыма ўсталяваць, бо файл $outFile мае версію $0, але патрабуецца іншая"
+;        MessageBox MB_OK "Немагчыма ўсталяваць, бо файл $outFile мае версію $0, аднак патрабуецца іншая"
 ;        Abort
     StrCpy $wrongVersionsText "$wrongVersionsTextНемагчыма ўсталяваць увесь пакунак, бо файл $outFile мае версію $0$\r$\n$\r$\n"
 done:
@@ -157,7 +157,7 @@ Function wrongVersionsCheck
     Pop $0
     ${NSD_SetText} $0 "$wrongVersionsText"
 
-    !insertmacro MUI_HEADER_TEXT "Памылка ўсталёўкі" "Ня ўсе файлы магчыма ўсталяваць. Дашліце інфармацыю распрацоўшчыкам альбо ўсталюйце апошнія абнаўленні Windows 7 і паспрабуйце зноў."
+    !insertmacro MUI_HEADER_TEXT "Памылка ўсталявання" "Не ўсе файлы магчыма ўсталяваць. Дашліце інфармацыю распрацоўнікам альбо ўсталюйце апошнія абнаўленні Windows 7 і паспрабуйце зноў."
     nsDialogs::Show
 FunctionEnd
 
@@ -220,7 +220,7 @@ Section
     ${registry::Write} "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\MUI\UILanguages\be-BY" "ru-RU" "" REG_MULTI_SZ $R0
 
 IfRebootFlag 0 NoReboot
-  MessageBox MB_YESNO|MB_ICONQUESTION "Каб скончыць усталёўку, трэба перазапусціць камп'ютар. Зрабіць гэта зараз ?" IDNO NoReboot
+  MessageBox MB_YESNO|MB_ICONQUESTION "Каб скончыць усталяванне, трэба перазапусціць камп'ютар. Зрабіць гэта зараз?" IDNO NoReboot
     Reboot
 NoReboot:
 SectionEnd
@@ -246,12 +246,12 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\win7bel"
 
 IfRebootFlag 0 NoReboot
-  MessageBox MB_YESNO|MB_ICONQUESTION "Каб выдаліць некаторыя файлы трэба перазапусціць камп'ютар. Зрабіць гэта зараз ?" IDNO NoReboot
+  MessageBox MB_YESNO|MB_ICONQUESTION "Каб выдаліць некаторыя файлы, трэба перазапусціць камп'ютар. Зрабіць гэта зараз?" IDNO NoReboot
     Reboot
 NoReboot:
 
   IntCmp $FirstInstall 0 NoRebootFirst
-    MessageBox MB_YESNO|MB_ICONQUESTION "Каб мець магчымасьць абраць беларускую мову ў панэлі кіраваньня трэба перазапусціць камп'ютар. Зрабіць гэта зараз ?" IDNO NoRebootFirst
+    MessageBox MB_YESNO|MB_ICONQUESTION "Каб мець магчымасьць абраць беларускую мову ў панэлі кіравання, трэба перазапусціць камп'ютар. Зрабіць гэта зараз?" IDNO NoRebootFirst
       Reboot
 NoRebootFirst:
 

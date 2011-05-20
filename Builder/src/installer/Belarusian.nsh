@@ -6,12 +6,12 @@
 
 !ifdef MUI_WELCOMEPAGE
   ${LangFileString} MUI_TEXT_WELCOME_INFO_TITLE "Вас вiтае майстар усталявання беларускага перакладу Windows 7"
-  ${LangFileString} MUI_TEXT_WELCOME_INFO_TEXT "Гэтая праграма ўсталюе $(^NameDA) на Ваш камп'ютар.$\r$\n$\r$\nПерад пачаткам усталявання прапануем зачыніць усе праграмы, якія зараз працуюць. Гэта дапаможа ўсталёўніку абнавіць сістэмныя файлы без перазапуску камп'ютара.$\r$\n$\r$\n$_CLICK"
+  ${LangFileString} MUI_TEXT_WELCOME_INFO_TEXT "Гэтая праграма ўсталюе беларускі пераклад Windows 7 на ваш камп'ютар.$\r$\n$\r$\nПерад пачаткам усталявання прапануем зачыніць усе праграмы, якія зараз працуюць. Гэта дапаможа ўсталёўніку абнавіць сістэмныя файлы без перазапуску камп'ютара.$\r$\n$\r$\n$_CLICK"
 !endif
 
 !ifdef MUI_UNWELCOMEPAGE
   ${LangFileString} MUI_UNTEXT_WELCOME_INFO_TITLE "Вас вiтае майстар высталявання беларускага перакладу Windows 7"
-  ${LangFileString} MUI_UNTEXT_WELCOME_INFO_TEXT "Гэтая праграма высталюе беларускі пераклад Windows 7 з Вашага камп'ютара.$\r$\n$\r$\nПерад пачаткам высталёўвання пераканайцеся ў тым, што Вы абралі іншую мову Windows 7.$\r$\n$\r$\n$_CLICK"
+  ${LangFileString} MUI_UNTEXT_WELCOME_INFO_TEXT "Гэтая праграма высталюе беларускі пераклад Windows 7 з вашага камп'ютара.$\r$\n$\r$\nПерад пачаткам высталёўвання пераканайцеся ў тым, што вы абралі іншую мову Windows 7.$\r$\n$\r$\n$_CLICK"
 !endif
 
 !ifdef MUI_LICENSEPAGE
@@ -60,7 +60,7 @@
 
 !ifdef MUI_UNDIRECTORYPAGE
   ${LangFileString} MUI_UNTEXT_DIRECTORY_TITLE "Абранне каталога для высталявання"
-  ${LangFileString} MUI_UNTEXT_DIRECTORY_SUBTITLE "Азначце каталог, з якога трэба высталояваць $(^NameDA)."
+  ${LangFileString} MUI_UNTEXT_DIRECTORY_SUBTITLE "Азначце каталог, з якога трэба высталяваць беларускі пераклад Windows 7."
 !endif
 
 !ifdef MUI_INSTFILESPAGE
@@ -83,7 +83,7 @@
 
 !ifdef MUI_FINISHPAGE
   ${LangFileString} MUI_TEXT_FINISH_INFO_TITLE "Заканчэнне ўсталявання беларускага перакладу Windows 7"
-  ${LangFileString} MUI_TEXT_FINISH_INFO_TEXT "Усталяванне беларускага перакладу Windows 7 выкананае.$\r$\n$\r$\nНацісніце кнопку $\"Гатова$\" для выйсця з усталёўніка."
+  ${LangFileString} MUI_TEXT_FINISH_INFO_TEXT "Усталяванне беларускага перакладу Windows 7 выкананае.$\r$\n$\r$\nНацісніце кнопку $\"Гатова$\" для выхаду з усталёўніка."
   ${LangFileString} MUI_TEXT_FINISH_INFO_REBOOT "Каб скончыць усталяванне беларускага перакладу Windows 7, неабходна перазапусціць камп'ютар. Зрабіць гэта зараз?"
 !endif
 
@@ -96,15 +96,15 @@
 !ifdef MUI_FINISHPAGE | MUI_UNFINISHPAGE
   ${LangFileString} MUI_TEXT_FINISH_REBOOTNOW "Так, перазапусціць камп'ютар зараз"
   ${LangFileString} MUI_TEXT_FINISH_REBOOTLATER "Не, перазапусціць камп'ютар пазней"
-  ${LangFileString} MUI_TEXT_FINISH_RUN "Запусціць $(^NameDA)"
+  ${LangFileString} MUI_TEXT_FINISH_RUN "Запусціць беларускі пераклад Windows 7"
   ${LangFileString} MUI_TEXT_FINISH_SHOWREADME "Паказаць інфармацыю аб пакунку"
   ${LangFileString} MUI_BUTTONTEXT_FINISH "&Гатова"  
 !endif
 
 !ifdef MUI_STARTMENUPAGE
   ${LangFileString} MUI_TEXT_STARTMENU_TITLE "Каталог ў Пачатковае меню"
-  ${LangFileString} MUI_TEXT_STARTMENU_SUBTITLE "Вылучыце каталог ў Пачатковым меню для размяшчэння пускальнікаў пакунка."
-  ${LangFileString} MUI_INNERTEXT_STARTMENU_TOP "Вылучыце каталог ў Пачатковым меню для размяшчэння пускальнікаў пакунка. Вы таксама можаце азначыць іншую назву каталога."
+  ${LangFileString} MUI_TEXT_STARTMENU_SUBTITLE "Абярыце каталог ў Пачатковым меню для размяшчэння пускальнікаў пакунка."
+  ${LangFileString} MUI_INNERTEXT_STARTMENU_TOP "Абярыце каталог ў Пачатковым меню для размяшчэння пускальнікаў пакунка. Вы таксама можаце азначыць іншую назву каталога."
   ${LangFileString} MUI_INNERTEXT_STARTMENU_CHECKBOX "Не ствараць пускальнікі"
 !endif
 
