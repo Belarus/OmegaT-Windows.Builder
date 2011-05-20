@@ -47,6 +47,8 @@ import win7.Utils;
 
 /**
  * Распакоўка рэсурсаў з .mui файлаў у .rc.
+ * 
+ * Extract: 7z x '-ir!en-US' ../*.wim
  */
 public class ExtractResources {
 
