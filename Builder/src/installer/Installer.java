@@ -125,6 +125,7 @@ public class Installer {
 
     protected static String getVersion(byte[] file) throws Exception {
         ReaderWriterMUI mui = new ReaderWriterMUI(file);
+        mui.read();
         byte[] ver = mui.getCompiledResources().get(ResUtils.TYPE_VERSION).get(1);
         ParserVersion pv = new ParserVersion();
         pv.parse(1, new MemoryFile(ver), new PrintWriter(new StringWriter()));

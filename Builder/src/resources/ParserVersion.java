@@ -28,7 +28,7 @@ import java.util.List;
  * Дэкампілятар рэсурсаў вэрсій.
  */
 public class ParserVersion  {
-    static final byte[] MARK = "VS_VERSION_INFO\0\0".getBytes(ResUtils.UNICODE);
+    public static final byte[] MARK = "VS_VERSION_INFO\0\0".getBytes(ResUtils.UNICODE);
     static final byte[] SFI = "StringFileInfo".getBytes(ResUtils.UNICODE);
     static final int TYPE_STRING = 1;
     static final int TYPE_BIN = 0;

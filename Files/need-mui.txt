@@ -1,0 +1,138 @@
+Program Files/Common Files/Microsoft Shared/ink/en-US/InputPersonalization.exe.mui
+Program Files/Common Files/Microsoft Shared/ink/en-US/mshwLatin.dll.mui
+Program Files/Common Files/Microsoft Shared/ink/en-US/rtscom.dll.mui
+Program Files/Common Files/Microsoft Shared/ink/en-US/tabskb.dll.mui
+Program Files/Internet Explorer/en-US/iedvtool.dll.mui
+Program Files/Internet Explorer/en-US/ieinstal.exe.mui
+Program Files/Internet Explorer/en-US/ielowutil.exe.mui
+Program Files/Internet Explorer/en-US/iexplore.exe.mui
+Program Files/Internet Explorer/en-US/jsdbgui.dll.mui
+Program Files/Internet Explorer/en-US/jsdebuggeride.dll.mui
+Program Files/Internet Explorer/en-US/JSProfilerCore.dll.mui
+Program Files/Internet Explorer/en-US/jsprofilerui.dll.mui
+Program Files/Internet Explorer/en-US/networkinspection.dll.mui
+Program Files/Windows Defender/en-US/MpAsDesc.dll.mui
+Program Files/Windows Defender/en-US/MpEvMsg.dll.mui
+Program Files/Windows Defender/en-US/MsMpRes.dll.mui
+Program Files/Windows Media Player/en-US/mpvis.dll.mui
+Program Files/Windows Media Player/en-US/setup_wm.exe.mui
+Program Files/Windows Media Player/en-US/wmlaunch.exe.mui
+Program Files/Windows Media Player/en-US/WMPDMCCore.dll.mui
+Program Files/Windows Media Player/en-US/WMPDMC.exe.mui
+Program Files/Windows Media Player/en-US/wmplayer.exe.mui
+Program Files/Windows Media Player/en-US/WMPMediaSharing.dll.mui
+Program Files/Windows Media Player/en-US/wmpnetwk.exe.mui
+Program Files/Windows Media Player/en-US/wmpnscfg.exe.mui
+Program Files/Windows Media Player/en-US/wmpnssci.dll.mui
+Program Files/Windows Media Player/en-US/wmpnssui.dll.mui
+Program Files/Windows Media Player/en-US/WMPSideShowGadget.exe.mui
+Program Files/Windows NT/Accessories/en-US/wordpad.exe.mui
+Program Files/Windows Photo Viewer/en-US/ImagingDevices.exe.mui
+Program Files/Windows Photo Viewer/en-US/PhotoAcq.dll.mui
+Program Files/Windows Photo Viewer/en-US/PhotoViewer.dll.mui
+Program Files/Windows Sidebar/en-US/sbdrop.dll.mui
+Program Files/Windows Sidebar/en-US/Sidebar.exe.mui
+Windows/diagnostics/system/DeviceCenter/en-US/DiagPackage.dll.mui
+Windows/en-US/explorer.exe.mui
+Windows/en-US/notepad.exe.mui#############################################
+Windows/en-US/regedit.exe.mui
+Windows/servicing/en-US/CbsMsg.dll.mui
+Windows/System32/en-US/aclui.dll.mui
+Windows/System32/en-US/acppage.dll.mui
+Windows/System32/en-US/ActionCenterCPL.dll.mui
+Windows/System32/en-US/ActionCenter.dll.mui
+Windows/System32/en-US/authui.dll.mui
+Windows/System32/en-US/batmeter.dll.mui
+Windows/System32/en-US/batt.dll.mui
+Windows/System32/en-US/biocpl.dll.mui
+Windows/System32/en-US/BitLockerWizardElev.exe.mui
+Windows/System32/en-US/BitLockerWizard.exe.mui
+Windows/System32/en-US/bootstr.dll.mui
+Windows/System32/en-US/cabview.dll.mui
+Windows/System32/en-US/calc.exe.mui
+Windows/System32/en-US/charmap.exe.mui
+Windows/System32/en-US/cmmon32.exe.mui
+Windows/System32/en-US/colorcpl.exe.mui
+Windows/System32/en-US/comdlg32.dll.mui
+Windows/System32/en-US/cscui.dll.mui
+Windows/System32/en-US/desk.cpl.mui
+Windows/System32/en-US/DeviceCenter.dll.mui
+Windows/System32/en-US/devmgr.dll.mui
+Windows/System32/en-US/DfrgUI.exe.mui
+Windows/System32/en-US/Display.dll.mui
+Windows/System32/en-US/DisplaySwitch.exe.mui
+Windows/System32/en-US/DocumentPerformanceEvents.dll.mui
+Windows/System32/en-US/explorerframe.dll.mui
+Windows/System32/en-US/fdprint.dll.mui
+Windows/System32/en-US/fontext.dll.mui
+Windows/System32/en-US/fontview.exe.mui
+Windows/System32/en-US/fsquirt.exe.mui
+Windows/System32/en-US/FunDisc.dll.mui
+Windows/System32/en-US/fvewiz.dll.mui
+Windows/System32/en-US/hotplug.dll.mui
+Windows/System32/en-US/ieframe.dll.mui
+Windows/System32/en-US/inetcpl.cpl.mui
+Windows/System32/en-US/input.dll.mui
+Windows/System32/en-US/intl.cpl.mui
+Windows/System32/en-US/ipconfig.exe.mui
+Windows/System32/en-US/kernel32.dll.mui
+Windows/System32/en-US/KernelBase.dll.mui
+Windows/System32/en-US/mblctr.exe.mui
+Windows/System32/en-US/mlang.dll.mui
+Windows/System32/en-US/mmcndmgr.dll.mui
+Windows/System32/en-US/mmres.dll.mui
+Windows/System32/en-US/mmsys.cpl.mui
+Windows/System32/en-US/msieftp.dll.mui
+Windows/System32/en-US/mspaint.exe.mui
+Windows/System32/en-US/msutb.dll.mui
+Windows/System32/en-US/netcenter.dll.mui
+Windows/System32/en-US/netshell.dll.mui
+Windows/System32/en-US/NetworkExplorer.dll.mui
+Windows/System32/en-US/NetworkItemFactory.dll.mui
+Windows/System32/en-US/notepad.exe.mui
+Windows/System32/en-US/ntshrui.dll.mui
+Windows/System32/en-US/oleaccrc.dll.mui
+Windows/System32/en-US/pnidui.dll.mui
+Windows/System32/en-US/powercfg.cpl.mui
+Windows/System32/en-US/powercfg.exe.mui
+Windows/System32/en-US/powercpl.dll.mui
+Windows/System32/en-US/powrprof.dll.mui
+Windows/System32/en-US/propsys.dll.mui
+Windows/System32/en-US/rasdlg.dll.mui
+Windows/System32/en-US/rasmm.dll.mui
+Windows/System32/en-US/sdcpl.dll.mui
+Windows/System32/en-US/sdshext.dll.mui
+Windows/System32/en-US/searchfolder.dll.mui
+Windows/System32/en-US/sendmail.dll.mui
+Windows/System32/en-US/shell32.dll.mui
+Windows/System32/en-US/sndvol.exe.mui
+Windows/System32/en-US/sndvolsso.dll.mui
+Windows/System32/en-US/StikyNot.exe.mui
+Windows/System32/en-US/stobject.dll.mui
+Windows/System32/en-US/StorageContextHandler.dll.mui
+Windows/System32/en-US/sud.dll.mui
+Windows/System32/en-US/systemcpl.dll.mui
+Windows/System32/en-US/taskbarcpl.dll.mui
+Windows/System32/en-US/taskmgr.exe.mui
+Windows/System32/en-US/tcpipcfg.dll.mui
+Windows/System32/en-US/themecpl.dll.mui
+Windows/System32/en-US/themeservice.dll.mui
+Windows/System32/en-US/timedate.cpl.mui
+Windows/System32/en-US/twext.dll.mui
+Windows/System32/en-US/user32.dll.mui
+Windows/System32/en-US/usercpl.dll.mui
+Windows/System32/en-US/VAN.dll.mui
+Windows/System32/en-US/WerFault.exe.mui
+Windows/System32/en-US/werui.dll.mui
+Windows/System32/en-US/WFSR.dll.mui
+Windows/System32/en-US/wininit.exe.mui
+Windows/System32/en-US/winlogon.exe.mui
+Windows/System32/en-US/winsrv.dll.mui
+Windows/System32/en-US/wlanpref.dll.mui
+Windows/System32/en-US/wmploc.DLL.mui
+Windows/System32/en-US/wuaueng.dll.mui
+Windows/System32/en-US/wucltux.dll.mui
+Windows/System32/en-US/zipfldr.dll.mui
+Windows/System32/migwiz/en-US/migres.dll.mui
+Windows/System32/oobe/en-US/msoobeui.dll.mui
+Windows/System32/oobe/en-US/W32UIRes.dll.mui

@@ -1,27 +1,41 @@
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
 import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import muifile.ReaderWriterMUI;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 import resources.MemoryFile;
 import resources.ParserVersion;
-
 import win7.Utils;
 
 public class Find {
 
-    static final String[] FILES_MUI = new String[] { "ieframe.dll.mui", "inetcpl.cpl.mui", "aclui.dll.mui",
-            "shell32.dll.mui" };
+    static File zipDir;
+    static File outDir;
+
+    static Map<String, String> files;
 
     public static void main(String[] args) throws Exception {
-        File[] zips = new File(args[0]).listFiles(new FileFilter() {
+        Assert.assertEquals("Execute: Find <fromdir> <todir>", 2, args.length);
+
+        zipDir = new File(args[0]);
+        outDir = new File(args[1]);
+        FileUtils.deleteDirectory(outDir);
+
+        loadNeed();
+
+        File[] zips = zipDir.listFiles(new FileFilter() {
             public boolean accept(File pathname) {
                 return pathname.isFile() && pathname.getName().endsWith(".zip");
             }
@@ -35,24 +49,51 @@ public class Find {
                     continue;
                 }
 
-                boolean need = false;
-                for (String r : FILES_MUI) {
+                String outSubDir = null;
+                for (String r : files.keySet()) {
                     if (ze.getName().endsWith("/" + r)) {
-                        need = true;
+                        outSubDir = files.get(r);
                         break;
                     }
                 }
-                if (need) {
+                if (outSubDir != null) {
                     byte[] data = Utils.readZip(zip, ze);
-                    processFile(ze.getName(), data);
+                    processFile(ze.getName(), outSubDir, data);
                 }
             }
         }
     }
 
-    protected static void processFile(String path, byte[] data) {
-        System.out.println("  " + path);
-        System.out.println("      " + getVersion(data));
+    protected static void loadNeed() throws Exception {
+        File need = new File(zipDir, "need-mui.txt");
+        files = new HashMap<String, String>();
+        for (String f : (List<String>) FileUtils.readLines(need, "UTF-8")) {
+            if (f.endsWith("###")) {
+                continue;
+            }
+            int pos = f.lastIndexOf('/');
+            String dir = f.substring(0, pos + 1);
+            String file = f.substring(pos + 1);
+            Assert.assertTrue(pos > 0);
+            Assert.assertNull(f, files.get(file));
+            files.put(file, dir);
+        }
+    }
+
+    protected static void processFile(String zipPath, String outSubDir, byte[] data) throws Exception {
+        ReaderWriterMUI mui = new ReaderWriterMUI(data);
+        String version = getVersion(data) + '_' + mui.readArch();
+        System.out.println("  " + zipPath + ": " + version);
+
+        String fn = zipPath.replaceAll(".+/", "");
+        fn = fn.replaceAll("(\\.mui)$", '.' + version + "$1");
+        File out = new File(outDir, outSubDir + fn);
+        if (out.exists()) {
+            byte[] exist = FileUtils.readFileToByteArray(out);
+            Assert.assertArrayEquals(exist, data);
+        } else {
+            FileUtils.writeByteArrayToFile(out, data);
+        }
     }
 
     static final Charset UTF16 = Charset.forName("UTF-16LE");

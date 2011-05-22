@@ -143,6 +143,7 @@ public class ExtractResources {
 
     protected static String parseMUI(String fspath, byte[] data) throws Exception {
         ReaderWriterMUI mui = new ReaderWriterMUI(data);
+        mui.read();
 
         Map<Object, Map<Object, byte[]>> minused = SkipResources.minus(fspath, mui.getCompiledResources(),
                 SkipResources.SKIP_EXTRACT);

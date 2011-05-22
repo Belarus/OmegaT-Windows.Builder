@@ -48,6 +48,7 @@ public class CheckFonts {
         for (Map.Entry<String, File> e : filesMUI.entrySet()) {
             System.out.println(e.getKey());
             ReaderWriterMUI mui = new ReaderWriterMUI(FileUtils.readFileToByteArray(e.getValue()));
+            mui.read();
             Map<Object, Map<Object, byte[]>> res = mui.getCompiledResources();
 
             res = SkipResources.minus(e.getKey().replace("/be-BY/", "/en-US/"), res,

@@ -40,6 +40,7 @@ public class ReaderWriterMUI {
     static final short IMAGE_SUBSYSTEM_WINDOWS_GUI = 2;
     static final Charset ASCII = Charset.forName("ASCII");
 
+    final MemoryFile f;
     byte[] MSDOSstub;
     COFF_Header coffHeader;
     COFF_OptionalHeader coffOptionalHeader;
@@ -49,16 +50,14 @@ public class ReaderWriterMUI {
     Map<Object, Map<Object, byte[]>> resources;
 
     public ReaderWriterMUI(byte[] data) throws Exception {
-        MemoryFile rd = new MemoryFile(data);
-
-        read(rd);
+        f = new MemoryFile(data);
     }
 
     public Map<Object, Map<Object, byte[]>> getCompiledResources() {
         return resources;
     }
 
-    protected void read(MemoryFile f) throws Exception {
+    public void read() throws Exception {
         // check PE signature
         f.seek(0x3C);
         int PEsignatureOffset = f.readInt();
@@ -145,6 +144,25 @@ public class ReaderWriterMUI {
             }
             resources.put(s1.ID, ri);
         }
+    }
+    
+    public String readArch() throws Exception {
+        // check PE signature
+        f.seek(0x3C);
+        int PEsignatureOffset = f.readInt();
+
+        f.seek(PEsignatureOffset);
+        int PESignature = f.readInt();
+        if (PESignature != 0x00004550) { // 'PE\0\0' signature
+            throw new Exception("There is no 'PE' signature");
+        }
+
+        // read COFF header
+        coffHeader = new COFF_Header();
+        coffHeader.read(f);
+        checkCoffHeader();
+
+        return coffHeader.Machine == IMAGE_FILE_MACHINE_I386 ? "x32" : "x64";
     }
 
     public void write(MemoryFile wr) throws Exception {

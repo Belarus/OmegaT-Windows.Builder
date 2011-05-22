@@ -276,6 +276,7 @@ public class CompileResources {
         tryRecreate(data, inFileName, trFileName);
 
         ReaderWriterMUI mui = new ReaderWriterMUI(data);
+        mui.read();
         ResUtils.removeEmptyStrings(mui.getCompiledResources());
 
         // compile localized resources
@@ -323,6 +324,7 @@ public class CompileResources {
     protected static void tryRecreate(byte[] originData, String fn, String trFileName) throws Exception {
         // parse binary DLL to separate binary resources
         ReaderWriterMUI mui = new ReaderWriterMUI(originData);
+        mui.read();
 
         // recreate DLL
         MemoryFile muiOut = new MemoryFile();
