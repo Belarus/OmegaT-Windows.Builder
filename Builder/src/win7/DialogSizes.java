@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,8 +26,7 @@ public class DialogSizes {
     static Pattern RE_PLACE = Pattern
             .compile("([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*\\-\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)\\s*,\\s*([0-9]+)");
 
-    // Map<file,Map<dialogID,List>>
-    final Map<String, Map<Object, List<SizeChange>>> changes = new TreeMap<String, Map<Object, List<SizeChange>>>();
+    final List<FileInfo> changes = new ArrayList<FileInfo>();
 
     public int errors;
 
@@ -37,7 +35,7 @@ public class DialogSizes {
         String s;
         int line = 0;
 
-        String file = null;
+        FileInfo fi = null;
         Object dialogID = null;
         SizeChange ch = null;
 
@@ -51,18 +49,17 @@ public class DialogSizes {
 
             Matcher m;
             if ((m = RE_FILE.matcher(s)).matches()) {
-                file = m.group(1);
-                if (!changes.containsKey(file)) {
-                    changes.put(file, new HashMap<Object, List<SizeChange>>());
-                }
+                fi = new FileInfo();
+                fi.file = Pattern.compile(m.group(1));
+                changes.add(fi);
             } else if ((m = RE_DIALOG.matcher(s)).matches()) {
                 try {
                     dialogID = Integer.parseInt(m.group(1));
                 } catch (NumberFormatException ex) {
                     dialogID = m.group(1);
                 }
-                if (!changes.get(file).containsKey(dialogID)) {
-                    changes.get(file).put(dialogID, new ArrayList<SizeChange>());
+                if (!fi.changes.containsKey(dialogID)) {
+                    fi.changes.put(dialogID, new ArrayList<SizeChange>());
                 }
             } else if ((m = RE_CONTROL.matcher(s)).matches()) {
                 ch = new SizeChange();
@@ -76,7 +73,7 @@ public class DialogSizes {
             } else if ((m = RE_PLACE.matcher(s)).matches()) {
                 ch.oldPlace = getRect(m, 1);
                 ch.newPlace = getRect(m, 5);
-                changes.get(file).get(dialogID).add(ch);
+                fi.changes.get(dialogID).add(ch);
                 ch = null;
             } else {
                 throw new Exception("Unknown line in DialogSizes: " + s);
@@ -110,14 +107,11 @@ public class DialogSizes {
         return out.toString();
     }
 
-    public void incCounts(String filename) {
-        Map<Object, List<SizeChange>> changesForFile = changes.get(filename);
-        if (changesForFile == null) {
-            return;
-        }
-        for (Map.Entry<Object, List<SizeChange>> d : changesForFile.entrySet()) {
-            for (SizeChange sc : d.getValue()) {
-                sc.appliedLeaved++;
+    public void startProcessing(String filename) {
+        for (FileInfo fi : changes) {
+            if (fi.file.matcher(filename).matches()) {
+                fi.processedCount++;
+                return;
             }
         }
     }
@@ -126,14 +120,20 @@ public class DialogSizes {
      * Fix mui for change dialog sizes
      */
     public void fix(String file, Map<Object, Map<Object, byte[]>> resources, boolean dryRun) throws Exception {
-        Map<Object, List<SizeChange>> changesForFile = changes.get(file);
+        FileInfo changesForFile = null;
+        for (FileInfo fi : changes) {
+            if (fi.file.matcher(file).matches()) {
+                changesForFile = fi;
+                break;
+            }
+        }
         if (changesForFile == null) {
             return;
         }
         Map<Object, byte[]> dialogs = resources.get(ResUtils.TYPE_DIALOG);
         if (dialogs != null) {
             for (Object k : dialogs.keySet()) {
-                List<SizeChange> dialogChanges = changesForFile.get(k);
+                List<SizeChange> dialogChanges = changesForFile.changes.get(k);
                 if (dialogChanges == null) {
                     continue;
                 }
@@ -160,12 +160,16 @@ public class DialogSizes {
     }
 
     public void report() {
-        for (Map.Entry<String, Map<Object, List<SizeChange>>> f : changes.entrySet()) {
-            for (Map.Entry<Object, List<SizeChange>> d : f.getValue().entrySet()) {
-                for (SizeChange sc : d.getValue()) {
-                    if (sc.appliedLeaved > 0) {
-                        System.err.println("Not fixed size for DIALOG #" + d.getKey() + " control#"
-                                + sc.controlID + " in file " + f.getKey());
+        for (FileInfo fi : changes) {
+            if (fi.processedCount == 0) {
+                System.err.println("File not processed: " + fi.file);
+            } else {
+                for (Map.Entry<Object, List<SizeChange>> d : fi.changes.entrySet()) {
+                    for (SizeChange sc : d.getValue()) {
+                        if (sc.appliedCount != fi.processedCount) {
+                            System.err.println("Not fixed size for DIALOG #" + d.getKey() + " control#"
+                                    + sc.controlID + " in file " + fi.file);
+                        }
                     }
                 }
             }
@@ -186,7 +190,7 @@ public class DialogSizes {
                     dialog.y = (short) ch.newPlace.y;
                     dialog.cx = (short) ch.newPlace.width;
                     dialog.cy = (short) ch.newPlace.height;
-                    ch.appliedLeaved--;
+                    ch.appliedCount++;
                 }
                 break;
             }
@@ -213,7 +217,7 @@ public class DialogSizes {
                     dialogItem.y = (short) ch.newPlace.y;
                     dialogItem.cx = (short) ch.newPlace.width;
                     dialogItem.cy = (short) ch.newPlace.height;
-                    ch.appliedLeaved--;
+                    ch.appliedCount++;
                 }
                 break;
             }
@@ -237,13 +241,6 @@ public class DialogSizes {
         return r;
     }
 
-    protected static class SizeChange {
-        long controlID;
-        String controlTitle;
-        Rectangle oldPlace, newPlace;
-        int appliedLeaved; // колькі разоў трэба аплаіць
-    }
-
     public class BOMBufferedReader extends BufferedReader {
         public BOMBufferedReader(Reader rd) throws IOException {
             super(rd);
@@ -255,4 +252,18 @@ public class DialogSizes {
             }
         }
     }
+
+    protected static class FileInfo {
+        Pattern file;
+        int processedCount;
+        Map<Object, List<SizeChange>> changes = new HashMap<Object, List<SizeChange>>();
+    }
+
+    protected static class SizeChange {
+        long controlID;
+        String controlTitle;
+        Rectangle oldPlace, newPlace;
+        int appliedCount;
+    }
+
 }
