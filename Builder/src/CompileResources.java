@@ -81,7 +81,7 @@ public class CompileResources {
         fromPath = args[0];
 
         // execute OmegaT for translate
-        // translate();
+        translate();
 
         // remote output dir
         FileUtils.deleteDirectory(new File(outPath));

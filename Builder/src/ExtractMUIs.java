@@ -166,7 +166,8 @@ public class ExtractMUIs {
         String version = getVersion(data);
         String arch = mui.readArch();
 
-        String outPath = normPath.replaceAll("\\.mui$", "_") + version + '_' + arch + ".mui";
+        String outPath = normPath.replace("/en-US/", "/be-BY/").replaceAll("\\.mui$", "_") + version + '_'
+                + arch + ".mui";
 
         System.out.println("  " + zipPath + " -> " + outPath);
 

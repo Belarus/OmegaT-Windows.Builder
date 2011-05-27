@@ -19,10 +19,8 @@
 package installer;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,9 +28,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import junit.framework.Assert;
 import muifile.ReaderWriterMUI;
 
 import org.apache.commons.io.FileUtils;
@@ -41,13 +40,11 @@ import org.apache.commons.io.IOUtils;
 import resources.MemoryFile;
 import resources.ParserVersion;
 import resources.ResUtils;
-import win7.Utils;
 
 /**
  * Ствараем файл усталёўкі для NSIS.
  */
 public class Installer {
-    static File SOURCE_DIR = new File("../Files/");
     static File OUT_DIR = new File("../out/");
 
     /** Трэба падаваць свае назвы, бо у JDK 1.6 назвы месяцаў няправільныя. */
@@ -59,29 +56,11 @@ public class Installer {
     }
 
     public static void make() throws Exception {
-        Map<String, String> SYSDIR32 = new TreeMap<String, String>();
-        Map<String, String> SYSDIR64 = new TreeMap<String, String>();
 
-        SYSDIR32.put("Program Files", "$PROGRAMFILES");
-        SYSDIR32.put("Windows", "$WINDIR");
-
-        SYSDIR64.put("Program Files (x86)", "$PROGRAMFILES32");
-        SYSDIR64.put("Program Files", "$PROGRAMFILES64");
-        SYSDIR64.put("Windows", "$WINDIR");
-
-        Process p32 = new Process(SYSDIR32);
-        p32.listFiles("x32sprtm", false);
-        p32.listFiles("x32sp0", false);
-        p32.listFiles("x32sp1", false);
-        p32.listFiles("ie8x32sp0", true);
-        p32.listFiles("ie8x32sp1", true);
-        p32.listFiles("ie9x32sp0", true);
-        Process p64 = new Process(SYSDIR64);
-        p64.listFiles("x64sp0", false);
-        p64.listFiles("x64sp1", false);
-        p64.listFiles("ie8x64sp0", true);
-        p64.listFiles("ie8x64sp1", true);
-        p64.listFiles("ie9x64sp0", true);
+        Process p32 = new Process();
+        p32.listFiles(true);
+        Process p64 = new Process();
+        p64.listFiles(false);
 
         Calendar c = Calendar.getInstance();
         String dateText = c.get(Calendar.DAY_OF_MONTH) + " " + MONTHS[c.get(Calendar.MONTH)] + " "
@@ -101,8 +80,6 @@ public class Installer {
         templateVars.put("##FILEINSTALL64##", p64.getFileInstall());
         templateVars.put("##DIR_INSTALL64##", p64.getDirInstall());
         templateVars.put("##DIR_UNINSTALL64##", p64.getDirUninstall());
-        templateVars.put("##FILESCOUNT32##", Integer.toString(p32.filesCount()));
-        templateVars.put("##FILESCOUNT64##", Integer.toString(p64.filesCount()));
 
         patchFile("readme.txt", templateVars);
         patchFile("win7bel.nsi", templateVars);
@@ -134,85 +111,48 @@ public class Installer {
                 + (pv.vi.dwFileVersionLS >> 16) + "." + (pv.vi.dwFileVersionLS & 0xFFFF);
     }
 
-    protected static String getSha1(String fn) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("SHA1");
-        FileInputStream fis = new FileInputStream(new File(SOURCE_DIR, fn));
-        byte[] dataBytes = new byte[1024];
-
-        int nread = 0;
-
-        while ((nread = fis.read(dataBytes)) != -1) {
-            md.update(dataBytes, 0, nread);
-        }
-
-        byte[] mdbytes = md.digest();
-        // convert the byte to hex format
-        StringBuffer sb = new StringBuffer("");
-        for (int i = 0; i < mdbytes.length; i++) {
-            sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
-        }
-
-        return sb.toString();
-    }
-
     protected static void copy(String file) throws Exception {
         byte[] data = IOUtils.toByteArray(Installer.class.getResourceAsStream("/installer/" + file));
         FileUtils.writeByteArrayToFile(new File(OUT_DIR, file), data);
     }
 
     protected static class Process {
-        final Map<String, String> sysDirs;
-
-        // Map<OutputWindowsPath, Map<version,localPath>>
         Map<String, Map<String, String>> versions = new TreeMap<String, Map<String, String>>();
 
         Map<String, Boolean> optionals = new TreeMap<String, Boolean>();
 
-        Set<String> dirs = new TreeSet<String>();
-
-        public Process(Map<String, String> sysDirs) throws Exception {
-            this.sysDirs = sysDirs;
-        }
-
-        public void listFiles(String dirSrc, boolean optional) throws Exception {
-            Map<String, File> files = ResUtils.listFiles(new File(OUT_DIR, dirSrc), null);
-            for (Map.Entry<String, File> f : files.entrySet()) {
-                try {
-                    String winFile = getSysDirFile(f.getKey());
-                    String diskFile = dirSrc + '/' + f.getKey();
-                    String version;
-
-                    ZipFile zip = new ZipFile(new File(SOURCE_DIR, dirSrc+".zip"));
-                    byte[] originalFile = Utils.readZip(zip,
-                            new ZipEntry(f.getKey().replace("/be-BY/", "/en-US/")));
-                    zip.close();
-
-                    if (winFile.endsWith(".mui")) {
-                        version = getVersion(originalFile);
-                    } else {
-                        version = "z";// getSha1(dirSrc + f.getKey().replace("/be-BY/", "/en-US/"));
-                    }
-                    Map<String, String> verFiles = versions.get(winFile);
-                    if (verFiles == null) {
-                        verFiles = new TreeMap<String, String>();
-                        versions.put(winFile, verFiles);
-                        optionals.put(winFile, optional);
-                    }
-                    verFiles.put(version, diskFile);
-
-                } catch (Exception ex) {
-                    System.err.println("File: " + f.getKey());
-                    throw ex;
-                }
+        public void listFiles(boolean x32) throws Exception {
+            if (x32) {
+                addDir("$PROGRAMFILES/", "Program Files/", new File(OUT_DIR, "Program Files"));
+                addDir("$WINDIR/", "Windows/", new File(OUT_DIR, "Windows"));
+            } else {
+                addDir("$PROGRAMFILES64/", "Program Files/", new File(OUT_DIR, "Program Files"));
+                addDir("$PROGRAMFILES32/", "Program Files/", new File(OUT_DIR, "Program Files"));
+                addDir("$WINDIR/", "Windows/", new File(OUT_DIR, "Windows"));
+                addDir("$WINDIR/SysWOW64/", "Windows/System32/", new File(OUT_DIR, "Windows/System32"));
             }
         }
 
-        private String getSysDirFile(String fn) {
-            int pos = fn.indexOf('/');
-            String prefix = fn.substring(0, pos);
-            String var = sysDirs.get(prefix);
-            String destFile = (var + fn.substring(pos)).replace('/', '\\').replace("\\en-US\\", "\\be-BY\\");
-            return destFile;
+        protected void addDir(String winPrefix, String localPrefix, File dir) {
+            Map<String, File> files = ResUtils.listFiles(dir, "mui");
+            for (Map.Entry<String, File> f : files.entrySet()) {
+                addFile(winPrefix + f.getKey(), localPrefix + f.getKey());
+            }
+        }
+
+        static final Pattern RE_FILE_VERSION = Pattern.compile("^(.+)_(\\d+\\.\\d+\\.\\d+\\.\\d+_x\\d+).mui");
+
+        private void addFile(String winPath, String localPath) {
+            Matcher m = RE_FILE_VERSION.matcher(winPath);
+            Assert.assertTrue(m.matches());
+            String fn = m.group(1) + ".mui";
+            String ver = m.group(2);
+            Map<String, String> fv = versions.get(fn);
+            if (fv == null) {
+                fv = new TreeMap<String, String>();
+                versions.put(fn, fv);
+            }
+            fv.put(ver, localPath);
         }
 
         // public void listFilesold(File dirFind, String dirSrc) throws Exception {
@@ -227,67 +167,74 @@ public class Installer {
         // }
         // }
 
-        protected String getFileVersions() {
+        private String getFileVersions() {
             StringBuilder o = new StringBuilder();
 
-            for (String fw : versions.keySet()) {
-                if (fw.toLowerCase().endsWith(".mui")) {
-                    boolean optional = optionals.get(fw);
-                    o.append("\tPush \"" + fw + "\"\n");
-                    if (optional) {
-                        o.append("\tCall FindMuiFileOptional\n");
-                    } else {
-                        o.append("\tCall FindMuiFile\n");
-                    }
-                    o.append("\t!insertmacro GetMuiVersion \"$outFile\"\n");
-                    // o.append("\t!insertmacro GetFileVersion \"$outFile\"\n");
-                    for (String v : versions.get(fw).keySet()) {
-                        o.append("\tPush \"" + v + "\"\n");
-                    }
-                    o.append("\tCall VersionsCheckFunc\n");
-                    o.append("\tnxs::Update /NOUNLOAD \"Спраўджваем усталяваныя версіі...\" /pos $9 /end\n");
-                    o.append("\tIntOp $9 $9 + 1\n");
-                    o.append("\n");
-                }
-            }
+            // for (String fw : versions.keySet()) {
+            // if (fw.toLowerCase().endsWith(".mui")) {
+            // // boolean optional = optionals.get(fw);
+            // boolean optional = false;
+            // o.append("\tPush \"" + fw + "\"\n");
+            // if (optional) {
+            // o.append("\tCall FindMuiFileOptional\n");
+            // } else {
+            // o.append("\tCall FindMuiFile\n");
+            // }
+            // o.append("\t!insertmacro GetMuiVersion \"$outFile\"\n");
+            // // o.append("\t!insertmacro GetFileVersion \"$outFile\"\n");
+            // for (String v : versions.get(fw).keySet()) {
+            // o.append("\tPush \"" + v + "\"\n");
+            // }
+            // o.append("\tCall VersionsCheckFunc\n");
+            // o.append("\tnxs::Update /NOUNLOAD \"Спраўджваем усталяваныя версіі...\" /pos $9 /end\n");
+            // o.append("\tIntOp $9 $9 + 1\n");
+            // o.append("\n");
+            // }
+            // }
 
             return o.toString();
         }
 
-        int filesCount() {
-            return versions.size();
-        }
-
-        protected String getFileUnpack() {
+        private String getFileUnpack() {
             StringBuilder o = new StringBuilder();
+            int fileIndex = 1;
             for (String fw : versions.keySet()) {
+                String fwWin = fw.replace('/', '\\');
+                o.append(";  File " + fileIndex + "\n");
+                o.append("\t!insertmacro GetMuiVersion '" + fw + "'\n");
+                int versionIndex = 1;
                 for (String v : versions.get(fw).keySet()) {
-                    if (fw.endsWith(".mui")) {
-                        o.append("\t!insertmacro InstallMuiVersion \"" + fw + "\" \"" + v + "\" \""
-                                + versions.get(fw).get(v).replace('/', '\\') + "\"\n");
-                    } else {
-                        o.append("\t!insertmacro InstallFileVersion \"" + fw + "\" \"" + v + "\" \""
-                                + versions.get(fw).get(v).replace('/', '\\') + "\"\n");
-                    }
+                    o.append("\tStrCmp $0 '" + v + "' 0 versionEnd_" + fileIndex + "_" + versionIndex + "\n");
+                    o.append("\t\tFile '/oname=" + fwWin + ".new' '"
+                            + versions.get(fw).get(v).replace('/', '\\') + "'\n");
+                    o.append("\t\tDelete /REBOOTOK '" + fwWin + "'\n");
+                    o.append("\t\tRename /REBOOTOK '" + fwWin + ".new' '" + fwWin + "'\n");
+                    o.append("\t\tGoto fileEnd" + fileIndex + "\n");
+                    o.append("versionEnd_" + fileIndex + "_" + versionIndex + ":\n");
+                    versionIndex++;
                 }
+                o.append("\tStrCpy $wrongVersionsText \"$wrongVersionsTextНемагчыма ўсталяваць увесь пакунак, бо файл "
+                        + fw + " мае версію $0$\\r$\\n$\\r$\\n\"\n");
+                o.append("fileEnd" + fileIndex + ":\n\n");
+                fileIndex++;
             }
             return o.toString();
         }
 
-        protected String getFileInstall() {
+        private String getFileInstall() {
             StringBuilder o = new StringBuilder();
-            for (String fw : versions.keySet()) {
-                o.append("\tDelete /REBOOTOK '" + fw + "'\n");
-                o.append("\tRename /REBOOTOK '" + fw + ".new' '" + fw + "'\n");
-                o.append("\n");
-            }
+            // for (String fw : versions.keySet()) {
+            // o.append("\tDelete /REBOOTOK '" + fw + "'\n");
+            // o.append("\tRename /REBOOTOK '" + fw + ".new' '" + fw + "'\n");
+            // o.append("\n");
+            // }
             return o.toString();
         }
 
         protected String getDirInstall() {
             StringBuilder o = new StringBuilder();
             for (String d : getUniqueDirs()) {
-                o.append("\tCreateDirectory  '" + d + "'\n");
+                o.append("\tCreateDirectory  '" + d.replace('/', '\\') + "'\n");
             }
             return o.toString();
         }
@@ -295,7 +242,7 @@ public class Installer {
         protected String getDirUninstall() {
             StringBuilder o = new StringBuilder();
             for (String d : getUniqueDirs()) {
-                o.append("\tRmDir /r /REBOOTOK '" + d + "'\n");
+                o.append("\tRmDir /r /REBOOTOK '" + d.replace('/', '\\') + "'\n");
             }
             return o.toString();
         }
@@ -303,11 +250,16 @@ public class Installer {
         private Set<String> getUniqueDirs() {
             Set<String> result = new TreeSet<String>();
             for (String fw : versions.keySet()) {
-                int pos = fw.lastIndexOf('\\');
+                int pos = fw.lastIndexOf('/');
                 String d = fw.substring(0, pos);
                 result.add(d);
             }
             return result;
         }
+    }
+
+    protected static class FileInfo {
+        String winPath, localDir;
+
     }
 }
