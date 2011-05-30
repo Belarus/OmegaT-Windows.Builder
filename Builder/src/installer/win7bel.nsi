@@ -25,9 +25,9 @@ ${StrRep}
 ;--------------------------------
 ;Pages
   !insertmacro MUI_PAGE_LICENSE "readme.txt"
-  Page custom wrongVersionsCheck
 
   !insertmacro MUI_PAGE_INSTFILES
+  Page custom wrongVersionsCheck
   
   !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_INSTFILES  
@@ -42,109 +42,75 @@ LoadLanguageFile "Belarusian.nlf"
 
 ;--------------------------------
 
-Var /GLOBAL DIR
-Var /GLOBAL outFile
 Var /GLOBAL wrongVersionsText
 Var /GLOBAL FirstInstall ; Усталёўваем першы раз - прапанаваць reboot
 
 
-Function FindMuiFile
-    Pop $0
-    ${StrRep} $outFile "$0" "\be-BY\" "\en-US\"
-    Push $outFile
-    Pop $1
-    IfFileExists $outFile go
-    ${StrRep} $outFile "$0" "\be-BY\" "\ru-RU\"
-    Push $outFile
-    Pop $2
-    IfFileExists $outFile go
-    StrCpy $wrongVersionsText "$wrongVersionsTextНемагчыма ўсталяваць увесь пакунак, бо не існуе ані файла $1, ані файла $2$\r$\n$\r$\n"
-go:
-FunctionEnd
-
-Function FindMuiFileOptional
-    Pop $0
-    ${StrRep} $outFile "$0" "\be-BY\" "\en-US\"
-    Push $outFile
-    Pop $1
-    IfFileExists $outFile go
-    ${StrRep} $outFile "$0" "\be-BY\" "\ru-RU\"
-    Push $outFile
-    Pop $2
-    IfFileExists $outFile go
-go:
-FunctionEnd
-
-!macro GetMuiVersion muiFile
-    GetDllVersion "${muiFile}" $R0 $R1
+Function GetMuiVersion
+    ${StrRep} $1 $0 '\be-BY\' '\en-US\'
+    IfFileExists $1 gmvgo
+    ${StrRep} $1 $0 '\be-BY\' '\ru-RU\'
+    IfFileExists $1 gmvgo
+    StrCpy $0 ""
+    Goto gmvend
+gmvgo:
+    GetDllVersion $1 $R0 $R1
     IntOp $R2 $R0 / 0x00010000
     IntOp $R3 $R0 & 0x0000FFFF
     IntOp $R4 $R1 / 0x00010000
     IntOp $R5 $R1 & 0x0000FFFF
     StrCpy $0 "$R2.$R3.$R4.$R5"
-!macroend
+    
+    FileOpen $2 $1 r
+    FileSeek $2 0x3C
+    nsisFile::FileReadBytes $2 1
+    nsisFile::FileReadBytes $2 1
+    nsisFile::FileReadBytes $2 1
+    nsisFile::FileReadBytes $2 1
+    Pop $4
+    Pop $5
+    Pop $6
+    Pop $7
+    
+    StrCpy $4 "0x$4"
+    StrCpy $5 "0x$5"
+    StrCpy $6 "0x$6"
+    StrCpy $7 "0x$7"
 
-!macro GetFileVersion file
-    Crypto::HashFile "SHA1" "${file}"
-    Pop $0
-    MessageBox MB_OK "$0 ${file}"
-!macroend
+    IntOp $4 $4 << 24 
+    IntOp $5 $5 << 16 
+    IntOp $6 $6 << 8
 
-Function VersionsCheckFunc
-  StrCmp "0.0.0.0" $0 fetchall again
-
-fetchall:
-    Pop $1
-    IfErrors done
-    Goto fetchall
-
-again:
-    Pop $1
-    IfErrors wrong
-    StrCmp $1 $0 done 0
-    Goto again
-wrong:
-;        MessageBox MB_OK "Немагчыма ўсталяваць, бо файл $outFile мае версію $0, аднак патрабуецца іншая"
-;        Abort
-    StrCpy $wrongVersionsText "$wrongVersionsTextНемагчыма ўсталяваць увесь пакунак, бо файл $outFile мае версію $0$\r$\n$\r$\n"
-done:
+    IntOp $3 $7 + 0 
+    IntOp $3 $3 | $6 
+    IntOp $3 $3 | $5 
+    IntOp $3 $3 | $4 
+    
+    FileSeek $2 $3
+    nsisFile::FileReadBytes $2 4
+    Pop $3
+    StrCmp $3 "50450000" 0 gmvclose
+    
+    nsisFile::FileReadBytes $2 2
+    Pop $3
+    StrCpy $3 "0x$3"
+    IntCmp $3 0x4C01 gmv32 gmv64
+    
+gmv32:
+    StrCpy $0 "$0_x32"
+    Goto gmvclose
+gmv64:
+    StrCpy $0 "$0_x64"
+    Goto gmvclose
+    
+gmvclose:
+    FileClose $2
+gmvend:
 FunctionEnd
-
-!macro InstallMuiVersion outPath ver inPath
-    Push "${outPath}"
-    Call FindMuiFile
-    !insertmacro GetMuiVersion "$outFile"
-    StrCmp "${ver}" "$0" 0 +2
-    File '/oname=${outPath}.new' '${inPath}'
-!macroend
-
-!macro InstallFileVersion outPath ver inPath
-;    Crypto::HashFile "SHA1" "${outPath}"
-;    Pop $0
-;    StrCmp "${ver}" "$0" 0 +2
-    File '/oname=${outPath}.new' '${inPath}'
-!macroend
 
 
 Function wrongVersionsCheck
 
-    StrCpy $wrongVersionsText ""
-    
-    IntOp $9 0 + 0
-    
-    ${If} ${RunningX64}
-        ${DisableX64FSRedirection}
-
-        nxs::Show /NOUNLOAD "Спраўджваем усталяваныя версіі..." /top "" /sub "" /max /end ##FILESCOUNT64##
-        ##FILEVERSIONS64##
-        ${EnableX64FSRedirection}
-    ${Else}
-        nxs::Show /NOUNLOAD "Спраўджваем усталяваныя версіі..." /top "" /sub "" /max /end ##FILESCOUNT32##
-        ##FILEVERSIONS32##
-    ${EndIf}
-    
-    nxs::Destroy
-    
     StrCmp $wrongVersionsText "" 0 +2
         Abort
 
@@ -188,13 +154,13 @@ Section
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\win7bel" "DisplayVersion" "##DATE##"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\win7bel" "HelpLink" "http://mounik.org/w/Windows"
 
+    StrCpy $wrongVersionsText ""
+
     ${If} ${RunningX64}
     ${DisableX64FSRedirection}
-##FILEUNPACK64##
 ##FILEINSTALL64##
     ${EnableX64FSRedirection}
     ${Else}
-##FILEUNPACK32##
 ##FILEINSTALL32##
     ${EndIf}
 
@@ -223,6 +189,13 @@ IfRebootFlag 0 NoReboot
   MessageBox MB_YESNO|MB_ICONQUESTION "Каб скончыць усталяванне, трэба перазапусціць камп'ютар. Зрабіць гэта зараз?" IDNO NoReboot
     Reboot
 NoReboot:
+
+
+  IntCmp $FirstInstall 0 NoRebootFirst
+    MessageBox MB_YESNO|MB_ICONQUESTION "Каб мець магчымасьць абраць беларускую мову ў панэлі кіравання, трэба перазапусціць камп'ютар. Зрабіць гэта зараз?" IDNO NoRebootFirst
+      Reboot
+NoRebootFirst:
+
 SectionEnd
 ;--------------------------------
 ;Uninstaller Section
@@ -249,10 +222,5 @@ IfRebootFlag 0 NoReboot
   MessageBox MB_YESNO|MB_ICONQUESTION "Каб выдаліць некаторыя файлы, трэба перазапусціць камп'ютар. Зрабіць гэта зараз?" IDNO NoReboot
     Reboot
 NoReboot:
-
-  IntCmp $FirstInstall 0 NoRebootFirst
-    MessageBox MB_YESNO|MB_ICONQUESTION "Каб мець магчымасьць абраць беларускую мову ў панэлі кіравання, трэба перазапусціць камп'ютар. Зрабіць гэта зараз?" IDNO NoRebootFirst
-      Reboot
-NoRebootFirst:
 
 SectionEnd

@@ -70,14 +70,10 @@ public class Installer {
         Map<String, String> templateVars = new TreeMap<String, String>();
         templateVars.put("##DATE##", dateText);
         templateVars.put("##DATEMARK##", dateTextMark);
-        templateVars.put("##FILEVERSIONS32##", p32.getFileVersions());
-        templateVars.put("##FILEUNPACK32##", p32.getFileUnpack());
-        templateVars.put("##FILEINSTALL32##", p32.getFileInstall());
+        templateVars.put("##FILEINSTALL32##", p32.getFileUnpack("x32"));
+        templateVars.put("##FILEINSTALL64##", p64.getFileUnpack("x64"));
         templateVars.put("##DIR_INSTALL32##", p32.getDirInstall());
         templateVars.put("##DIR_UNINSTALL32##", p32.getDirUninstall());
-        templateVars.put("##FILEVERSIONS64##", p64.getFileVersions());
-        templateVars.put("##FILEUNPACK64##", p64.getFileUnpack());
-        templateVars.put("##FILEINSTALL64##", p64.getFileInstall());
         templateVars.put("##DIR_INSTALL64##", p64.getDirInstall());
         templateVars.put("##DIR_UNINSTALL64##", p64.getDirUninstall());
 
@@ -155,79 +151,32 @@ public class Installer {
             fv.put(ver, localPath);
         }
 
-        // public void listFilesold(File dirFind, String dirSrc) throws Exception {
-        // Map<String, File> files = ResUtils.listFiles(dirFind, null);
-        // for (Map.Entry<String, File> f : files.entrySet()) {
-        // processFile(sysDirs, f.getKey(), dirSrc, f.getValue());
-        // }
-        //
-        // for (String d : dirs) {
-        // dirInstall.append("\tCreateDirectory  '" + d + "'\n");
-        // dirUninstall.append("\tRmDir /r /REBOOTOK '" + d + "'\n");
-        // }
-        // }
-
-        private String getFileVersions() {
-            StringBuilder o = new StringBuilder();
-
-            // for (String fw : versions.keySet()) {
-            // if (fw.toLowerCase().endsWith(".mui")) {
-            // // boolean optional = optionals.get(fw);
-            // boolean optional = false;
-            // o.append("\tPush \"" + fw + "\"\n");
-            // if (optional) {
-            // o.append("\tCall FindMuiFileOptional\n");
-            // } else {
-            // o.append("\tCall FindMuiFile\n");
-            // }
-            // o.append("\t!insertmacro GetMuiVersion \"$outFile\"\n");
-            // // o.append("\t!insertmacro GetFileVersion \"$outFile\"\n");
-            // for (String v : versions.get(fw).keySet()) {
-            // o.append("\tPush \"" + v + "\"\n");
-            // }
-            // o.append("\tCall VersionsCheckFunc\n");
-            // o.append("\tnxs::Update /NOUNLOAD \"Спраўджваем усталяваныя версіі...\" /pos $9 /end\n");
-            // o.append("\tIntOp $9 $9 + 1\n");
-            // o.append("\n");
-            // }
-            // }
-
-            return o.toString();
-        }
-
-        private String getFileUnpack() {
+        private String getFileUnpack(String labelPrefix) {
             StringBuilder o = new StringBuilder();
             int fileIndex = 1;
             for (String fw : versions.keySet()) {
                 String fwWin = fw.replace('/', '\\');
                 o.append(";  File " + fileIndex + "\n");
-                o.append("\t!insertmacro GetMuiVersion '" + fw + "'\n");
+                o.append("\tStrCpy $0 '" + fwWin + "'\n");
+                o.append("\tCall GetMuiVersion\n");
+                o.append("\tStrCmp $0 '' " + labelPrefix + "FileEnd" + fileIndex + "\n");
                 int versionIndex = 1;
                 for (String v : versions.get(fw).keySet()) {
-                    o.append("\tStrCmp $0 '" + v + "' 0 versionEnd_" + fileIndex + "_" + versionIndex + "\n");
+                    o.append("\tStrCmp $0 '" + v + "' 0 " + labelPrefix + "VersionEnd_" + fileIndex + "_"
+                            + versionIndex + "\n");
                     o.append("\t\tFile '/oname=" + fwWin + ".new' '"
                             + versions.get(fw).get(v).replace('/', '\\') + "'\n");
                     o.append("\t\tDelete /REBOOTOK '" + fwWin + "'\n");
                     o.append("\t\tRename /REBOOTOK '" + fwWin + ".new' '" + fwWin + "'\n");
-                    o.append("\t\tGoto fileEnd" + fileIndex + "\n");
-                    o.append("versionEnd_" + fileIndex + "_" + versionIndex + ":\n");
+                    o.append("\t\tGoto " + labelPrefix + "FileEnd" + fileIndex + "\n");
+                    o.append(labelPrefix + "VersionEnd_" + fileIndex + "_" + versionIndex + ":\n");
                     versionIndex++;
                 }
                 o.append("\tStrCpy $wrongVersionsText \"$wrongVersionsTextНемагчыма ўсталяваць увесь пакунак, бо файл "
-                        + fw + " мае версію $0$\\r$\\n$\\r$\\n\"\n");
-                o.append("fileEnd" + fileIndex + ":\n\n");
+                        + fwWin + " мае версію $0$\\r$\\n$\\r$\\n\"\n");
+                o.append(labelPrefix + "FileEnd" + fileIndex + ":\n\n");
                 fileIndex++;
             }
-            return o.toString();
-        }
-
-        private String getFileInstall() {
-            StringBuilder o = new StringBuilder();
-            // for (String fw : versions.keySet()) {
-            // o.append("\tDelete /REBOOTOK '" + fw + "'\n");
-            // o.append("\tRename /REBOOTOK '" + fw + ".new' '" + fw + "'\n");
-            // o.append("\n");
-            // }
             return o.toString();
         }
 
@@ -256,10 +205,5 @@ public class Installer {
             }
             return result;
         }
-    }
-
-    protected static class FileInfo {
-        String winPath, localDir;
-
     }
 }
