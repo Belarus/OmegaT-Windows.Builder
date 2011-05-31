@@ -159,9 +159,11 @@ Section
     ${If} ${RunningX64}
     ${DisableX64FSRedirection}
 ##FILEINSTALL64##
+##FILEINSTALL64OTHER##
     ${EnableX64FSRedirection}
     ${Else}
 ##FILEINSTALL32##
+##FILEINSTALL32OTHER##
     ${EndIf}
 
 ; write updater

@@ -83,9 +83,26 @@ public class ExtractMUIs {
                     String requiredPath = isRequired(normPath);
                     if (requiredPath != null) {
                         byte[] data = Utils.readZip(zip, ze);
-                        int c = processFile(zipPath, normPath, data);
+                        int c = processMuiFile(zipPath, normPath, data);
                         files.put(requiredPath, files.get(requiredPath) + c);
                         extracted += c;
+                    }
+                }
+            }
+            // load gadgets
+            for (Enumeration<? extends ZipEntry> zit = zip.entries(); zit.hasMoreElements();) {
+                ZipEntry ze = zit.nextElement();
+                if (ze.isDirectory()) {
+                    continue;
+                }
+                String un = ze.getName().toUpperCase();
+                if (un.startsWith("Program Files/Windows Sidebar/Gadgets/".toUpperCase())
+                        || un.startsWith("Program Files (x86)/Windows Sidebar/Gadgets/".toUpperCase())) {
+                    if (!un.endsWith(".MUI")) {
+                        String zipPath = ze.getName();
+                        String normPath = normalizePath(zipPath);
+                        byte[] data = Utils.readZip(zip, ze);
+                        processOtherFile(zipPath, normPath, data);
                     }
                 }
             }
@@ -160,7 +177,7 @@ public class ExtractMUIs {
         }
     }
 
-    protected static int processFile(String zipPath, String normPath, byte[] data) throws Exception {
+    protected static int processMuiFile(String zipPath, String normPath, byte[] data) throws Exception {
         ReaderWriterMUI mui = new ReaderWriterMUI(data);
 
         String version = getVersion(data);
@@ -171,7 +188,23 @@ public class ExtractMUIs {
 
         System.out.println("  " + zipPath + " -> " + outPath);
 
-        File out = new File(OUT_DIR, outPath);
+        File out = new File(OUT_DIR, "mui/" + outPath);
+        if (out.exists()) {
+            byte[] exist = FileUtils.readFileToByteArray(out);
+            Assert.assertArrayEquals(exist, data);
+            return 0;
+        } else {
+            FileUtils.writeByteArrayToFile(out, data);
+            return 1;
+        }
+    }
+
+    protected static int processOtherFile(String zipPath, String normPath, byte[] data) throws Exception {
+        String outPath = normPath.replace("/en-US/", "/be-BY/");
+
+        System.out.println("  " + zipPath + " -> " + outPath);
+
+        File out = new File(OUT_DIR, "gadget/" + outPath);
         if (out.exists()) {
             byte[] exist = FileUtils.readFileToByteArray(out);
             Assert.assertArrayEquals(exist, data);

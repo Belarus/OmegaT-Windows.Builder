@@ -70,8 +70,10 @@ public class Installer {
         Map<String, String> templateVars = new TreeMap<String, String>();
         templateVars.put("##DATE##", dateText);
         templateVars.put("##DATEMARK##", dateTextMark);
-        templateVars.put("##FILEINSTALL32##", p32.getFileUnpack("x32"));
-        templateVars.put("##FILEINSTALL64##", p64.getFileUnpack("x64"));
+        templateVars.put("##FILEINSTALL32##", p32.getFileInstallMui("x32"));
+        templateVars.put("##FILEINSTALL64##", p64.getFileInstallMui("x64"));
+        templateVars.put("##FILEINSTALL32OTHER##", p32.getFileInstallOther());
+        templateVars.put("##FILEINSTALL64OTHER##", p64.getFileInstallOther());
         templateVars.put("##DIR_INSTALL32##", p32.getDirInstall());
         templateVars.put("##DIR_UNINSTALL32##", p32.getDirUninstall());
         templateVars.put("##DIR_INSTALL64##", p64.getDirInstall());
@@ -114,18 +116,26 @@ public class Installer {
 
     protected static class Process {
         Map<String, Map<String, String>> versions = new TreeMap<String, Map<String, String>>();
+        Map<String, String> nonVersioned = new TreeMap<String, String>();
 
         Map<String, Boolean> optionals = new TreeMap<String, Boolean>();
 
         public void listFiles(boolean x32) throws Exception {
             if (x32) {
-                addDir("$PROGRAMFILES/", "Program Files/", new File(OUT_DIR, "Program Files"));
-                addDir("$WINDIR/", "Windows/", new File(OUT_DIR, "Windows"));
+                addDir("$PROGRAMFILES/", "mui/Program Files/", new File(OUT_DIR, "mui/Program Files"));
+                addDir("$WINDIR/", "mui/Windows/", new File(OUT_DIR, "mui/Windows"));
+                addDirNonVersioned("$PROGRAMFILES/", "gadget/Program Files/", new File(OUT_DIR,
+                        "gadget/Program Files"));
             } else {
-                addDir("$PROGRAMFILES64/", "Program Files/", new File(OUT_DIR, "Program Files"));
-                addDir("$PROGRAMFILES32/", "Program Files/", new File(OUT_DIR, "Program Files"));
-                addDir("$WINDIR/", "Windows/", new File(OUT_DIR, "Windows"));
-                addDir("$WINDIR/SysWOW64/", "Windows/System32/", new File(OUT_DIR, "Windows/System32"));
+                addDir("$PROGRAMFILES64/", "mui/Program Files/", new File(OUT_DIR, "mui/Program Files"));
+                addDir("$PROGRAMFILES32/", "mui/Program Files/", new File(OUT_DIR, "mui/Program Files"));
+                addDir("$WINDIR/", "mui/Windows/", new File(OUT_DIR, "mui/Windows"));
+                addDir("$WINDIR/SysWOW64/", "mui/Windows/System32/",
+                        new File(OUT_DIR, "mui/Windows/System32"));
+                addDirNonVersioned("$PROGRAMFILES64/", "gadget/Program Files/", new File(OUT_DIR,
+                        "gadget/Program Files"));
+                addDirNonVersioned("$PROGRAMFILES32/", "gadget/Program Files/", new File(OUT_DIR,
+                        "gadget/Program Files"));
             }
         }
 
@@ -133,6 +143,13 @@ public class Installer {
             Map<String, File> files = ResUtils.listFiles(dir, "mui");
             for (Map.Entry<String, File> f : files.entrySet()) {
                 addFile(winPrefix + f.getKey(), localPrefix + f.getKey());
+            }
+        }
+
+        protected void addDirNonVersioned(String winPrefix, String localPrefix, File dir) {
+            Map<String, File> files = ResUtils.listFiles(dir, null);
+            for (String f : files.keySet()) {
+                nonVersioned.put(winPrefix + f, localPrefix + f);
             }
         }
 
@@ -151,7 +168,7 @@ public class Installer {
             fv.put(ver, localPath);
         }
 
-        private String getFileUnpack(String labelPrefix) {
+        private String getFileInstallMui(String labelPrefix) {
             StringBuilder o = new StringBuilder();
             int fileIndex = 1;
             for (String fw : versions.keySet()) {
@@ -180,6 +197,18 @@ public class Installer {
             return o.toString();
         }
 
+        private String getFileInstallOther() {
+            StringBuilder o = new StringBuilder();
+            for (Map.Entry<String, String> fw : nonVersioned.entrySet()) {
+                String fwWin = fw.getKey().replace('/', '\\');
+                String fwLocal = fw.getValue().replace('/', '\\');
+                o.append("\tFile '/oname=" + fwWin + ".new' '" + fwLocal + "'\n");
+                o.append("\tDelete /REBOOTOK '" + fwWin + "'\n");
+                o.append("\tRename /REBOOTOK '" + fwWin + ".new' '" + fwWin + "'\n");
+            }
+            return o.toString();
+        }
+
         protected String getDirInstall() {
             StringBuilder o = new StringBuilder();
             for (String d : getUniqueDirs()) {
@@ -199,6 +228,11 @@ public class Installer {
         private Set<String> getUniqueDirs() {
             Set<String> result = new TreeSet<String>();
             for (String fw : versions.keySet()) {
+                int pos = fw.lastIndexOf('/');
+                String d = fw.substring(0, pos);
+                result.add(d);
+            }
+            for (String fw : nonVersioned.keySet()) {
                 int pos = fw.lastIndexOf('/');
                 String d = fw.substring(0, pos);
                 result.add(d);

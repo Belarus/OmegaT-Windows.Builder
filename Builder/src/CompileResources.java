@@ -90,11 +90,11 @@ public class CompileResources {
 
         // readList();
 
-        String rcPath = projectPath + "/target/";
+        String rcPath = projectPath + "/target/mui/";
 
         readJStrans(new File(projectPath + "/js-trans.txt"));
 
-        List<ListMUI.MUInfo> muis = ListMUI.listMUI(new File(args[0]));
+        List<ListMUI.MUInfo> muis = ListMUI.listMUI(new File(args[0], "mui"));
 
         int errors = 0;
         for (ListMUI.MUInfo mui : muis) {
@@ -104,17 +104,29 @@ public class CompileResources {
             try {
                 if (mui.file32 != null) {
                     System.err.println(mui.file32path);
-                    goMUI(mui.file32, new File(outPath, mui.file32path), new File(rcPath,
+                    goMUI(mui.file32, new File(outPath, "mui/" + mui.file32path), new File(rcPath,
                             mui.resourceFileName), mui.resourceFileName);
                 }
                 if (mui.file64 != null) {
                     System.err.println(mui.file64path);
-                    goMUI(mui.file64, new File(outPath, mui.file64path), new File(rcPath,
+                    goMUI(mui.file64, new File(outPath, "mui/" + mui.file64path), new File(rcPath,
                             mui.resourceFileName), mui.resourceFileName);
                 }
             } catch (Exception ex) {
                 errors++;
                 ex.printStackTrace();
+            }
+        }
+
+        Map<String, File> gadgets = ResUtils.listFiles(new File(args[0], "gadget"), null);
+        for (String f : gadgets.keySet()) {
+            File o = new File(outPath, "gadget/" + f);
+            o.getParentFile().mkdirs();
+            if (f.endsWith(".js")) {
+                byte[] data = FileUtils.readFileToByteArray(gadgets.get(f));
+                goJS(f, data, o);
+            } else {
+                FileUtils.copyFile(gadgets.get(f), o);
             }
         }
 
@@ -161,14 +173,9 @@ public class CompileResources {
 
     protected static void translate() throws Exception {
         // remove translations
-        File[] fs = new File(projectPath, "target").listFiles();
-        for (File f : fs) {
-            if (f.isDirectory()) {
-                FileUtils.deleteDirectory(f);
-            } else {
-                f.delete();
-            }
-        }
+        File targetDir = new File(projectPath, "target");
+        FileUtils.deleteDirectory(targetDir);
+        targetDir.mkdir();
 
         System.out.println("Initializing OmegaT");
         Map<String, String> pa = new TreeMap<String, String>();

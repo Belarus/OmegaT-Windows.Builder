@@ -39,7 +39,7 @@ public class ExtractResources {
         // тэкст rc,сьпіс файлаў у якіх такі rc
         Map<FileContent, Set<String>> contents = new HashMap<FileContent, Set<String>>();
 
-        List<ListMUI.MUInfo> muis = ListMUI.listMUI(new File(args[0]));
+        List<ListMUI.MUInfo> muis = ListMUI.listMUI(new File(args[0], "mui"));
 
         for (ListMUI.MUInfo mui : muis) {
             try {
@@ -55,14 +55,8 @@ public class ExtractResources {
                 if (rcText32 != null && rcText64 != null) {
                     Assert.assertEquals(rcText32, rcText64);
                 }
-                FileUtils.writeStringToFile(new File(tPath, mui.resourceFileName),
+                FileUtils.writeStringToFile(new File(tPath, "mui/" + mui.resourceFileName),
                         rcText32 != null ? rcText32 : rcText64, "UTF-8");
-                // Set<String> fnames = contents.get(content);
-                // if (fnames == null) {
-                // fnames = new TreeSet<String>();
-                // contents.put(content, fnames);
-                // }
-                // fnames.add(fspath);
             } catch (Exception ex) {
                 System.err.println("Error in " + mui.resourceFileName);
                 ex.printStackTrace();
@@ -70,35 +64,12 @@ public class ExtractResources {
             }
         }
 
-        // Map<String, FileContent> contentByNames = new TreeMap<String, ExtractResources.FileContent>();
-        // for (Map.Entry<FileContent, Set<String>> c : contents.entrySet()) {
-        // String fo = fileToName(c.getValue().iterator().next());
-        // contentByNames.put(fo, c.getKey());
-        // }
-        //
-        // Writer wr = new OutputStreamWriter(new FileOutputStream(sPath + "/list.txt"), "UTF-8");
-        // for (Map.Entry<String, FileContent> fc : contentByNames.entrySet()) {
-        // FileContent cKey = fc.getValue();
-        // Set<String> cValue = contents.get(cKey);
-        // String fo = fileToName(cValue.iterator().next());
-        // wr.write(fo + "\n");
-        // for (String f : cValue) {
-        // wr.write("+" + f + "\n");
-        // }
-        // wr.write("\n");
-        // File f = new File(tPath + fo);
-        // f.getParentFile().mkdirs();
-        // FileUtils.writeByteArrayToFile(f, cKey.byteContent);
-        //
-        // filesExist.remove(fo);
-        // }
-        // wr.close();
-        //
-        // for (String f : filesExist.keySet()) {
-        // if (!f.contains("/.svn/") && !f.startsWith(".svn/")) {
-        // System.out.println("Exist, but not converted: " + f);
-        // }
-        // }
+        Map<String, File> otherFiles = ResUtils.listFiles(new File(args[0], "gadget"), null);
+        for (String f : otherFiles.keySet()) {
+            System.out.println("Processing: " + f);
+            FileUtils.copyFile(otherFiles.get(f), new File(tPath, "gadget/" + f));
+        }
+
         System.out.println("Error count: " + errors);
     }
 

@@ -69,6 +69,8 @@ public class SkipResources {
             new ResourceID(null, ResUtils.TYPE_HTML),
             /* MUI */
             new ResourceID(null, "MUI"),
+            /* DATA */
+            new ResourceID(null, "DATA"),
             /* дзіўны тып */
             new ResourceID(null, 240),
             /* дзіўны тып */

@@ -12,6 +12,7 @@ Program Files/Internet Explorer/en-US/jsdebuggeride.dll.mui
 Program Files/Internet Explorer/en-US/JSProfilerCore.dll.mui
 Program Files/Internet Explorer/en-US/jsprofilerui.dll.mui
 Program Files/Internet Explorer/en-US/networkinspection.dll.mui
+Program Files/Microsoft Games/Chess/en-US/Chess.exe.mui
 Program Files/Windows Defender/en-US/MpAsDesc.dll.mui
 Program Files/Windows Defender/en-US/MpEvMsg.dll.mui
 Program Files/Windows Defender/en-US/MsMpRes.dll.mui
