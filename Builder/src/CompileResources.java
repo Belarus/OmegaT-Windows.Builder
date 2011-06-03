@@ -17,6 +17,8 @@
  along with this program; if not, see http://www.gnu.org/licenses.
  **************************************************************************/
 
+import installer.Installer;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -167,7 +169,7 @@ public class CompileResources {
         places.report();
 
         System.err.print("Installer... ");
-        // Installer.make();
+        Installer.make();
         System.err.println("OK");
     }
 
@@ -180,6 +182,8 @@ public class CompileResources {
         System.out.println("Initializing OmegaT");
         Map<String, String> pa = new TreeMap<String, String>();
         pa.put("ITokenizer", "org.omegat.plugins.tokenizer.SnowballEnglishTokenizer");
+        pa.put("alternate-filename-from", "_\\d+.\\d+.\\d+.\\d+_x\\d+.rc$");
+        pa.put("alternate-filename-to", "_VERSION.rc");
 
         RuntimePreferences.setConfigDir(configPath);
 

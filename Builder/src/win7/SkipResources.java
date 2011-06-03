@@ -123,7 +123,10 @@ public class SkipResources {
     /* Padding у загалоўках рэсурсаў */
     Pattern.compile("x(32|64)sp(0|1)/Windows/ehome/en\\-US/ehres.dll.mui"),
     /** */
-    Pattern.compile("Program Files/Windows Photo Viewer/be-BY/PhotoAcq.dll_6.1.7600.16385_x32.rc") };
+    Pattern.compile("Program Files/Windows Photo Viewer/be-BY/PhotoAcq.dll_6.1.7600.16385_x32.rc"),
+    /** Align */
+    Pattern.compile("Program Files/Microsoft Games/Chess/be-BY/Chess.exe_6.1.7600.16385_x32.rc"),
+    };
 
     public static boolean isSkipCompareFiles(String fn) {
         return isRegexListContains(SKIP_COMPARE_FILES, fn);

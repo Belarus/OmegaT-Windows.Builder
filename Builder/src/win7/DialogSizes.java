@@ -209,7 +209,7 @@ public class DialogSizes {
                 if (!dryRun) {
                     if (!eqEmpty(ch.controlTitle, (String) dialogItem.title)) {
                         errors++;
-                        System.err.println("Wrong text in control #" + dialogID + "/" + dialogItem.id
+                        System.err.println("DialogSizes: wrong text in control #" + dialogID + "/" + dialogItem.id
                                 + ": compiled: [" + dialogItem.title + "] in changes: [" + ch.controlTitle
                                 + "]");
                     }

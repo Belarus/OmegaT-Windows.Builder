@@ -60,9 +60,11 @@ Windows/System32/en-US/colorcpl.exe.mui
 Windows/System32/en-US/comdlg32.dll.mui
 Windows/System32/en-US/cscui.dll.mui
 Windows/System32/en-US/desk.cpl.mui
+Windows/System32/en-US/devenum.dll.mui
 Windows/System32/en-US/DeviceCenter.dll.mui
 Windows/System32/en-US/devmgr.dll.mui
 Windows/System32/en-US/DfrgUI.exe.mui
+Windows/System32/en-US/diskperf.exe.mui
 Windows/System32/en-US/Display.dll.mui
 Windows/System32/en-US/DisplaySwitch.exe.mui
 Windows/System32/en-US/DocumentPerformanceEvents.dll.mui
@@ -73,6 +75,7 @@ Windows/System32/en-US/fontview.exe.mui
 Windows/System32/en-US/fsquirt.exe.mui
 Windows/System32/en-US/FunDisc.dll.mui
 Windows/System32/en-US/fvewiz.dll.mui
+Windows/System32/en-US/gameux.dll.mui
 Windows/System32/en-US/hotplug.dll.mui
 Windows/System32/en-US/ieframe.dll.mui
 Windows/System32/en-US/inetcpl.cpl.mui
