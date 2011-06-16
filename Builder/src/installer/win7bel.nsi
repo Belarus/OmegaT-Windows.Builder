@@ -136,7 +136,7 @@ Section
     CreateDirectory  '$INSTDIR'
     
     File "/oname=$TEMP\win7bel-chown.exe" "..\Builder\updater\chown.exe"
-    ExecWait '$TEMP\win7bel-chown.exe $WINDIR\servicing $WINDIR\diagnostics\system\DeviceCenter' $0
+    ExecWait '$TEMP\win7bel-chown.exe $WINDIR\servicing $WINDIR\diagnostics\system\DeviceCenter $WINDIR\diagnostics\system\HomeGroup' $0
     IntCmp $0 0 +2
         Abort
     

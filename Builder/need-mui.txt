@@ -35,6 +35,7 @@ Program Files/Windows Photo Viewer/en-US/PhotoViewer.dll.mui
 Program Files/Windows Sidebar/en-US/sbdrop.dll.mui
 Program Files/Windows Sidebar/en-US/Sidebar.exe.mui
 Windows/diagnostics/system/DeviceCenter/en-US/DiagPackage.dll.mui
+Windows/diagnostics/system/HomeGroup/en-US/DiagPackage.dll.mui
 Windows/en-US/explorer.exe.mui
 Windows/System32/en-US/explorer.exe.mui
 Windows/en-US/notepad.exe.mui
@@ -76,6 +77,7 @@ Windows/System32/en-US/fsquirt.exe.mui
 Windows/System32/en-US/FunDisc.dll.mui
 Windows/System32/en-US/fvewiz.dll.mui
 Windows/System32/en-US/gameux.dll.mui
+Windows/System32/en-US/hgcpl.dll.mui
 Windows/System32/en-US/hotplug.dll.mui
 Windows/System32/en-US/ieframe.dll.mui
 Windows/System32/en-US/inetcpl.cpl.mui
@@ -137,6 +139,7 @@ Windows/System32/en-US/wininit.exe.mui
 Windows/System32/en-US/winlogon.exe.mui
 Windows/System32/en-US/winsrv.dll.mui
 Windows/System32/en-US/wlanpref.dll.mui
+Windows/System32/en-US/wlanui.dll.mui
 Windows/System32/en-US/wmploc.DLL.mui
 Windows/System32/en-US/wuaueng.dll.mui
 Windows/System32/en-US/wucltux.dll.mui
