@@ -11,7 +11,8 @@ namespace win7bel_updater
 {
     class Program
     {
-        static Uri VERSION_URL = new Uri("http://i18n-bel.berlios.de/i18n-bel-win7.version.txt");
+        static Uri VERSION_URL = new Uri("http://windows.mounik.org/i18n-bel-win7.version.txt");
+        static Uri INSTALLER_URL = new Uri("http://windows.mounik.org/win7bel.exe");
 
         static String instDir;
         static void Main()
@@ -64,7 +65,7 @@ namespace win7bel_updater
             String installFile = Environment.GetEnvironmentVariable("TEMP") + "\\win7bel.exe";
 
             WebClient client = new WebClient();
-            client.DownloadFile(new Uri("http://download.berlios.de/i18n-bel/win7bel.exe"), installFile);
+            client.DownloadFile(INSTALLER_URL, installFile);
             Process.Start(installFile);
         }
     }
