@@ -101,6 +101,12 @@ public class CompileResources {
         int errors = 0;
         for (ListMUI.MUInfo mui : muis) {
             if (SkipResources.isSkippedFile(mui.resourceFileName)) {
+                if (mui.file32 != null) {
+                    touch(new File(outPath, "mui/" + mui.file32path));
+                }
+                if (mui.file64 != null) {
+                    touch(new File(outPath, "mui/" + mui.file64path));
+                }
                 continue;
             }
             try {
@@ -171,6 +177,11 @@ public class CompileResources {
         System.err.print("Installer... ");
         Installer.make();
         System.err.println("OK");
+    }
+
+    protected static void touch(File f) throws Exception {
+        FileOutputStream out = new FileOutputStream(f);
+        out.close();
     }
 
     protected static void translate() throws Exception {

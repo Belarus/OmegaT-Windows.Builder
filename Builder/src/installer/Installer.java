@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -120,6 +121,8 @@ public class Installer {
 
         Map<String, Boolean> optionals = new TreeMap<String, Boolean>();
 
+        Set<String> skipped = new HashSet<String>();
+
         public void listFiles(boolean x32) throws Exception {
             if (x32) {
                 addDir("$PROGRAMFILES/", "mui/Program Files/", new File(OUT_DIR, "mui/Program Files"));
@@ -142,7 +145,7 @@ public class Installer {
         protected void addDir(String winPrefix, String localPrefix, File dir) {
             Map<String, File> files = ResUtils.listFiles(dir, "mui");
             for (Map.Entry<String, File> f : files.entrySet()) {
-                addFile(winPrefix + f.getKey(), localPrefix + f.getKey());
+                addFile(winPrefix + f.getKey(), localPrefix + f.getKey(), f.getValue());
             }
         }
 
@@ -155,7 +158,7 @@ public class Installer {
 
         static final Pattern RE_FILE_VERSION = Pattern.compile("^(.+)_(\\d+\\.\\d+\\.\\d+\\.\\d+_x\\d+).mui");
 
-        private void addFile(String winPath, String localPath) {
+        private void addFile(String winPath, String localPath, File f) {
             Matcher m = RE_FILE_VERSION.matcher(winPath);
             Assert.assertTrue(m.matches());
             String fn = m.group(1) + ".mui";
@@ -166,6 +169,9 @@ public class Installer {
                 versions.put(fn, fv);
             }
             fv.put(ver, localPath);
+            if (f.length() == 0) {
+                skipped.add(localPath);
+            }
         }
 
         private String getFileInstallMui(String labelPrefix) {
@@ -181,16 +187,20 @@ public class Installer {
                 for (String v : versions.get(fw).keySet()) {
                     o.append("\tStrCmp $0 '" + v + "' 0 " + labelPrefix + "VersionEnd_" + fileIndex + "_"
                             + versionIndex + "\n");
-                    o.append("\t\tFile '/oname=" + fwWin + ".new' '"
-                            + versions.get(fw).get(v).replace('/', '\\') + "'\n");
-                    o.append("\t\tDelete /REBOOTOK '" + fwWin + "'\n");
-                    o.append("\t\tRename /REBOOTOK '" + fwWin + ".new' '" + fwWin + "'\n");
+                    String muiFile = versions.get(fw).get(v);
+                    if (!skipped.contains(muiFile)) {
+                        o.append("\t\tFile '/oname=" + fwWin + ".new' '" + muiFile.replace('/', '\\') + "'\n");
+                        o.append("\t\tDelete /REBOOTOK '" + fwWin + "'\n");
+                        o.append("\t\tRename /REBOOTOK '" + fwWin + ".new' '" + fwWin + "'\n");
+                    }
                     o.append("\t\tGoto " + labelPrefix + "FileEnd" + fileIndex + "\n");
                     o.append(labelPrefix + "VersionEnd_" + fileIndex + "_" + versionIndex + ":\n");
                     versionIndex++;
                 }
-                o.append("\tStrCpy $wrongVersionsText \"$wrongVersionsTextНемагчыма ўсталяваць увесь пакунак, бо файл "
-                        + fwWin + " мае версію $0$\\r$\\n$\\r$\\n\"\n");
+                if (!fwWin.contains("\\biocpl.dll.mui")) { // exception
+                    o.append("\tStrCpy $wrongVersionsText \"$wrongVersionsTextНемагчыма ўсталяваць увесь пакунак, бо файл "
+                            + fwWin + " мае версію $0$\\r$\\n$\\r$\\n\"\n");
+                }
                 o.append(labelPrefix + "FileEnd" + fileIndex + ":\n\n");
                 fileIndex++;
             }
