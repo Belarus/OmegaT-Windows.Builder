@@ -29,6 +29,8 @@ namespace win7bel_updater
             }
             catch (Exception)
             {
+				// error request new version
+				return;
             }
 
             DialogResult result = MessageBox.Show("На сайце http://mounik.org ёсць больш позняя версія перакладу Windows 7. Усталяваць яе зараз ?", "Беларускі пераклад Windows 7", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
