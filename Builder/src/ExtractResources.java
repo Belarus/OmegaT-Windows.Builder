@@ -57,7 +57,7 @@ public class ExtractResources {
                 }
                 FileUtils.writeStringToFile(new File(tPath, "mui/" + mui.resourceFileName),
                         rcText32 != null ? rcText32 : rcText64, "UTF-8");
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 System.err.println("Error in " + mui.resourceFileName);
                 ex.printStackTrace();
                 errors++;

@@ -2,7 +2,7 @@
 
 1. Трэба мець файлы .mui, запакаваныя ў .zip. Файлы накшталт "windows6.1-KB976932-X64.exe" можна распакаваць праз "windows6.1-KB976932-X64.exe /X:out"
 
-2. .zip будуць распакаваныя праз ExtractMUIs у нейкі каталёг:
+2. .zip будуць распакаваныя праз ExtractMUIs(толькі тыя што ў need-mui.txt) у нейкі каталёг:
 
 d:\my\binaries\windows\ie8x32sp0.zip
   Program Files/Internet Explorer/en-US/hmmapi.dll.mui -> Program Files/Internet Explorer/be-BY/hmmapi.dll_8.0.7600.16385_x32.mui
