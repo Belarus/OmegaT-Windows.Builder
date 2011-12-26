@@ -91,6 +91,7 @@ Windows/System32/en-US/mlang.dll.mui
 Windows/System32/en-US/mmcndmgr.dll.mui
 Windows/System32/en-US/mmres.dll.mui
 Windows/System32/en-US/mmsys.cpl.mui
+Windows/System32/en-US/msdt.exe.mui
 Windows/System32/en-US/msieftp.dll.mui
 Windows/System32/en-US/mspaint.exe.mui
 Windows/System32/en-US/msutb.dll.mui
@@ -132,6 +133,7 @@ Windows/System32/en-US/twext.dll.mui
 Windows/System32/en-US/user32.dll.mui
 Windows/System32/en-US/usercpl.dll.mui
 Windows/System32/en-US/VAN.dll.mui
+Windows/System32/en-US/werconcpl.dll.mui
 Windows/System32/en-US/WerFault.exe.mui
 Windows/System32/en-US/werui.dll.mui
 Windows/System32/en-US/WFSR.dll.mui
