@@ -40,6 +40,8 @@ public class SkipResources {
             Pattern.compile("Windows/System32/be-BY/rasmm.dll_6.1.7600.16385_x32.rc"),
             Pattern.compile("Windows/System32/be-BY/netshell.dll_6.1.7600.16385_x32.rc"),
             Pattern.compile("Windows/System32/be-BY/tcpipcfg.dll_6.1.7600.16385_x32.rc"),
+            Pattern.compile("Windows/System32/be-BY/sysdm.cpl_6.1.7600.16385_x32.rc"),
+            Pattern.compile("Windows/System32/be-BY/WinSATAPI.dll_6.1.7600.16385_x32.rc"),
             Pattern.compile("Windows/System32/be-BY/wlanpref.dll_6.1.7600.16385_x32.rc"), };
 
     public static boolean isNulEolFile(String fn) {
@@ -96,6 +98,9 @@ public class SkipResources {
             new ResourceID("Windows/System32/be-BY/winsrv.dll_6.1.7600.16385_x32.rc",
                     ResUtils.TYPE_MESSAGETABLE, 1),
             /* Няправільны парадак радкоў */
+            new ResourceID("Windows/System32/be-BY/wininet.dll_8.0.7600.16385_x32.rc",
+                    ResUtils.TYPE_MESSAGETABLE, 1),
+            /* Няправільны парадак радкоў */
             new ResourceID("Windows/System32/be-BY/ntshrui.dll_6.1.7600.16385_x32.rc",
                     ResUtils.TYPE_MESSAGETABLE, 1) };
 
@@ -106,6 +111,8 @@ public class SkipResources {
     Pattern.compile("Windows/System32/be-BY/msutb.dll_6.1.7600.16385_x32.rc"),
     /* Padding напрыканцы файла занадта доўгі. */
     Pattern.compile("Windows/System32/be-BY/werui.dll_6.1.7600.16385_x32.rc"),
+    /* Няма padding'у напрыканцы файла. */
+    Pattern.compile("Windows/System32/be-BY/dssec.dll_6.1.7600.16385_x32.rc"),
     /* Padding у загалоўках рэсурсаў */
     Pattern.compile("Windows/System32/be-BY/calc.exe_6.1.7600.16385_x32.rc"),
     /* Загалоўкі рэсурсаў */
@@ -126,7 +133,8 @@ public class SkipResources {
     Pattern.compile("Program Files/Windows Photo Viewer/be-BY/PhotoAcq.dll_6.1.7600.16385_x32.rc"),
     /** Align */
     Pattern.compile("Program Files/Microsoft Games/Chess/be-BY/Chess.exe_6.1.7600.16385_x32.rc"),
-    };
+    /* Дзіўны padding */
+    Pattern.compile("Windows/System32/be-BY/werconcpl.dll_6.1.7600.16385_x32.rc"), };
 
     public static boolean isSkipCompareFiles(String fn) {
         return isRegexListContains(SKIP_COMPARE_FILES, fn);

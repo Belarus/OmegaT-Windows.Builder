@@ -1,16 +1,9 @@
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,15 +19,12 @@ import util.ListMUI;
 import win7.SkipResources;
 
 public class ExtractResources {
-    static String tPath = "../../Windows.OmegaT/Windows7/source/";
-
     static int errors = 0;
 
     public static void main(String[] args) throws Exception {
-        Assert.assertEquals("Execute: ExtractResources <fromdir>", 1, args.length);
+        Assert.assertEquals("Execute: ExtractResources <fromdir> <todir>", 2, args.length);
 
-        Map<String, File> filesExist = ResUtils.listFiles(new File(tPath), null);
-        filesExist.remove("list.txt");
+        FileUtils.deleteDirectory(new File(args[1]));
 
         // тэкст rc,сьпіс файлаў у якіх такі rc
         Map<FileContent, Set<String>> contents = new HashMap<FileContent, Set<String>>();
@@ -55,7 +45,7 @@ public class ExtractResources {
                 if (rcText32 != null && rcText64 != null) {
                     Assert.assertEquals(rcText32, rcText64);
                 }
-                FileUtils.writeStringToFile(new File(tPath, "mui/" + mui.resourceFileName),
+                FileUtils.writeStringToFile(new File(args[1], "mui/" + mui.resourceFileName),
                         rcText32 != null ? rcText32 : rcText64, "UTF-8");
             } catch (Throwable ex) {
                 System.err.println("Error in " + mui.resourceFileName);
@@ -67,7 +57,7 @@ public class ExtractResources {
         Map<String, File> otherFiles = ResUtils.listFiles(new File(args[0], "gadget"), null);
         for (String f : otherFiles.keySet()) {
             System.out.println("Processing: " + f);
-            FileUtils.copyFile(otherFiles.get(f), new File(tPath, "gadget/" + f));
+            FileUtils.copyFile(otherFiles.get(f), new File(args[1], "gadget/" + f));
         }
 
         System.out.println("Error count: " + errors);

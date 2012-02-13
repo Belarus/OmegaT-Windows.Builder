@@ -13,12 +13,17 @@ d:\my\binaries\windows\Windows7_x32_006.zip
 d:\my\binaries\windows\Windows7_x64_sp1.zip
   KB976933-LangsCab0/amd64_microsoft-windows-user32.resources_31bf3856ad364e35_6.1.7601.17514_en-us_9c23fd3941bcc44e/user32.dll.mui -> Windows/System32/be-BY/user32.dll_6.1.7601.17514_x64.mui
 
+ExtractMUIs f:\binaries\Windows\7 c:\temp\win\7
+ExtractMUIs f:\binaries\Windows\8 c:\temp\win\8
+
 3. ExtractResources - выняць рэсурсы ў тэкставыя файлы для OmegaT
+
+ExtractResources c:\temp\win\7 ../../Windows.OmegaT/Windows/source/7/
+ExtractResources c:\temp\win\8 ../../Windows.OmegaT/Windows/source/8/
 
 4. Пакласьці тэкставыя файлы рэсурсаў у git
 
-5. перакласьці рэсурсы з дапамогай OmegaT
+5. Скампіляваць рэсурсы праз CompileResources(яно і перакладзе з дапамогай OmegaT), 
+   і падрыхтуе файл out\win7bel.nsi для NSIS
 
-6. Скампіляваць рэсурсы праз CompileResources. Яно і падрыхтуе файл out\win7bel.nsi для NSIS
-
-7. Скампіляваць пакунак праз NSIS і пакласьці яго на сэрвер праз upload-http.sh
+6. Скампіляваць пакунак праз NSIS і пакласьці яго на сэрвер праз upload-http.sh

@@ -66,10 +66,11 @@ import win7.SkipResources;
  */
 public class CompileResources {
 
-    static String projectPath = "../../Windows.OmegaT/Windows7/";
-    static String configPath = "../../Windows.OmegaT/Windows7.settings/";
+    static String projectPath = "../../Windows.OmegaT/Windows/";
+    static String configPath = "../../Windows.OmegaT/Windows.settings/";
     static String outPath = "../out/";
     static String fromPath;
+    static String ver;
 
     static Map<String, List<JSENtry>> JS_TRANS = new TreeMap<String, List<JSENtry>>();
 
@@ -78,9 +79,10 @@ public class CompileResources {
     static Map<String, String> list = new HashMap<String, String>();
 
     public static void main(String[] args) throws Exception {
-        Assert.assertEquals("Execute: CompileResources <fromdir>", 1, args.length);
+        Assert.assertEquals("Execute: CompileResources <fromdir> <version(7 or 8)>", 2, args.length);
 
         fromPath = args[0];
+        ver = args[1];
 
         // execute OmegaT for translate
         translate();
@@ -88,13 +90,13 @@ public class CompileResources {
         // remote output dir
         FileUtils.deleteDirectory(new File(outPath));
 
-        places = new DialogSizes(new File(projectPath + "/dialog-sizes.txt"));
+        places = new DialogSizes(new File(projectPath + "/dialog-sizes-"+ver+".txt"));
 
         // readList();
 
-        String rcPath = projectPath + "/target/mui/";
+        String rcPath = projectPath + "/target/"+ver+"/mui/";
 
-        readJStrans(new File(projectPath + "/js-trans.txt"));
+        readJStrans(new File(projectPath + "/js-trans-"+ver+".txt"));
 
         List<ListMUI.MUInfo> muis = ListMUI.listMUI(new File(args[0], "mui"));
 
