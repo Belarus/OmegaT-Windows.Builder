@@ -109,7 +109,7 @@ public class CheckFonts {
      * вышыні літары.
      */
     protected static Dimension getDimension(ResourceDialog dialog, String text) throws Exception {
-        int fontPixelsSize = dialog.pointsize * 96 / 72;
+        int fontPixelsSize = (int) Math.round(dialog.pointsize * 96.0 / 72);
 
         Font f = getDialogFont(dialog).deriveFont(dialog.italic != 0 ? Font.ITALIC : 0, fontPixelsSize);
 
@@ -121,9 +121,13 @@ public class CheckFonts {
         FontRenderContext frc = new FontRenderContext(null, false, false);
         Rectangle2D strDialogUnits = f.getStringBounds(
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", frc);
-        // Колькасьць піксэляў у юніце
-        double dbuX = strDialogUnits.getWidth() / 52 / 4;
-        double dbuY = strDialogUnits.getHeight() / 8;
+        // Колькасьць піксэляў у юніце - http://support.microsoft.com/kb/125681
+        double fullWidth = strDialogUnits.getWidth();
+        double fullHeight = strDialogUnits.getHeight();
+        long avgWidth = Math.round(Math.ceil(fullWidth) / 26 + 1) / 2;
+        long avgHeight = Math.round(Math.ceil(fullHeight));        
+        double dbuX = avgWidth / 4.0;
+        double dbuY = avgHeight / 8.0;
 
         Rectangle2D strRect = f.getStringBounds(text.replace("&", ""), frc);
         int w = (int) Math.ceil(strRect.getWidth() / dbuX);
