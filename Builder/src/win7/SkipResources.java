@@ -36,6 +36,7 @@ public class SkipResources {
 
     private static final Pattern[] NULEOL_FILES = new Pattern[] {
             Pattern.compile("Windows/System32/be-BY/rasdlg.dll_6.1.7600.16385_x32.rc"),
+            Pattern.compile("Windows/System32/be-BY/main.cpl_6.1.7600.16385_x32.rc"),
             Pattern.compile("Windows/System32/be-BY/VAN.dll_6.1.7600.16385_x32.rc"),
             Pattern.compile("Windows/System32/be-BY/rasmm.dll_6.1.7600.16385_x32.rc"),
             Pattern.compile("Windows/System32/be-BY/netshell.dll_6.1.7600.16385_x32.rc"),
