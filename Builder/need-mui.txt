@@ -66,6 +66,7 @@ Windows/System32/en-US/cscui.dll.mui
 Windows/System32/en-US/desk.cpl.mui
 Windows/System32/en-US/devenum.dll.mui
 Windows/System32/en-US/DeviceCenter.dll.mui
+Windows/System32/en-US/DevicePairing.dll.mui
 Windows/System32/en-US/devmgr.dll.mui
 Windows/System32/en-US/DfrgUI.exe.mui
 Windows/System32/en-US/diskperf.exe.mui
@@ -90,6 +91,7 @@ Windows/System32/en-US/intl.cpl.mui
 Windows/System32/en-US/ipconfig.exe.mui
 Windows/System32/en-US/kernel32.dll.mui
 Windows/System32/en-US/KernelBase.dll.mui
+Windows/System32/en-US/main.cpl.mui
 Windows/System32/en-US/mblctr.exe.mui
 Windows/System32/en-US/mlang.dll.mui
 Windows/System32/en-US/mmcndmgr.dll.mui
